@@ -3,7 +3,7 @@
 #import <NIMAVChat/NIMAVChat.h>
 #import <MJExtension/MJExtension.h>
 #import "NimDataManager.h"
-#import "FaceunityManager/FUManager.h"
+//#import "FaceunityManager/FUManager.h"
 
 
 typedef enum : NSUInteger {
@@ -437,161 +437,163 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NIMDeleteMessagesOption *option = [NIMDeleteMessagesOption mj_objectWithKeyValues:call.arguments];
         [[[NIMSDK sharedSDK] conversationManager] deleteAllMessages:option];
         
-    }else if ([@"initFaceunity" isEqualToString:call.method]) {// Faceunity初始化
+    }
+    // else if ([@"initFaceunity" isEqualToString:call.method]) {// Faceunity初始化
         
-        [[FUManager shareManager] loadItems];
+    //     [[FUManager shareManager] loadItems];
         
-    }else if ([@"filter_name" isEqualToString:call.method]) {// 滤镜
+    // }else if ([@"filter_name" isEqualToString:call.method]) {// 滤镜
         
-        int typeIndex = [NSString stringWithFormat:@"%@",call.arguments[@"filterNameType"]].intValue;
-        [FUManager shareManager].selectedFilter = @[@"bailiang1",
-                                                    @"bailiang2",
-                                                    @"bailiang3",
-                                                    @"bailiang4",
-                                                    @"bailiang5",
-                                                    @"bailiang6",
-                                                    @"bailiang7",
-                                                    @"fennen1",
-                                                    @"fennen2",
-                                                    @"fennen3",
-                                                    @"fennen4",
-                                                    @"fennen5",
-                                                    @"fennen6",
-                                                    @"fennen7",
-                                                    @"fennen8",
-                                                    @"gexing1",
-                                                    @"gexing2",
-                                                    @"gexing3",
-                                                    @"gexing4",
-                                                    @"gexing5",
-                                                    @"gexing6",
-                                                    @"gexing7",
-                                                    @"gexing8",
-                                                    @"gexing9",
-                                                    @"gexing10",
-                                                    @"heibai1",
-                                                    @"heibai2",
-                                                    @"heibai3",
-                                                    @"heibai4",
-                                                    @"heibai5",
-                                                    @"lengsediao1",
-                                                    @"lengsediao2",
-                                                    @"lengsediao3",
-                                                    @"lengsediao4",
-                                                    @"lengsediao5",
-                                                    @"lengsediao6",
-                                                    @"lengsediao7",
-                                                    @"lengsediao8",
-                                                    @"lengsediao9",
-                                                    @"lengsediao10",
-                                                    @"lengsediao11",
-                                                    @"nuansediao1",
-                                                    @"nuansediao2",
-                                                    @"nuansediao3",][typeIndex];
+    //     int typeIndex = [NSString stringWithFormat:@"%@",call.arguments[@"filterNameType"]].intValue;
+    //     [FUManager shareManager].selectedFilter = @[@"bailiang1",
+    //                                                 @"bailiang2",
+    //                                                 @"bailiang3",
+    //                                                 @"bailiang4",
+    //                                                 @"bailiang5",
+    //                                                 @"bailiang6",
+    //                                                 @"bailiang7",
+    //                                                 @"fennen1",
+    //                                                 @"fennen2",
+    //                                                 @"fennen3",
+    //                                                 @"fennen4",
+    //                                                 @"fennen5",
+    //                                                 @"fennen6",
+    //                                                 @"fennen7",
+    //                                                 @"fennen8",
+    //                                                 @"gexing1",
+    //                                                 @"gexing2",
+    //                                                 @"gexing3",
+    //                                                 @"gexing4",
+    //                                                 @"gexing5",
+    //                                                 @"gexing6",
+    //                                                 @"gexing7",
+    //                                                 @"gexing8",
+    //                                                 @"gexing9",
+    //                                                 @"gexing10",
+    //                                                 @"heibai1",
+    //                                                 @"heibai2",
+    //                                                 @"heibai3",
+    //                                                 @"heibai4",
+    //                                                 @"heibai5",
+    //                                                 @"lengsediao1",
+    //                                                 @"lengsediao2",
+    //                                                 @"lengsediao3",
+    //                                                 @"lengsediao4",
+    //                                                 @"lengsediao5",
+    //                                                 @"lengsediao6",
+    //                                                 @"lengsediao7",
+    //                                                 @"lengsediao8",
+    //                                                 @"lengsediao9",
+    //                                                 @"lengsediao10",
+    //                                                 @"lengsediao11",
+    //                                                 @"nuansediao1",
+    //                                                 @"nuansediao2",
+    //                                                 @"nuansediao3",][typeIndex];
         
-    }else if ([@"filter_level" isEqualToString:call.method]) {// 滤镜level
+    // }else if ([@"filter_level" isEqualToString:call.method]) {// 滤镜level
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"filter_level"]].doubleValue;
-        [FUManager shareManager].selectedFilterLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"filter_level"]].doubleValue;
+    //     [FUManager shareManager].selectedFilterLevel = level;
         
-    }else if ([@"color_level" isEqualToString:call.method]) {// 美白level
+    // }else if ([@"color_level" isEqualToString:call.method]) {// 美白level
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"color_level"]].doubleValue;
-        [FUManager shareManager].whiteLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"color_level"]].doubleValue;
+    //     [FUManager shareManager].whiteLevel = level;
         
-    }else if ([@"red_level" isEqualToString:call.method]) {// 红润level
+    // }else if ([@"red_level" isEqualToString:call.method]) {// 红润level
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"red_level"]].doubleValue;
-        [FUManager shareManager].redLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"red_level"]].doubleValue;
+    //     [FUManager shareManager].redLevel = level;
         
-    }else if ([@"blur" isEqualToString:call.method]) {// 指定磨皮程度,推荐取值范围为0.0~6.0
+    // }else if ([@"blur" isEqualToString:call.method]) {// 指定磨皮程度,推荐取值范围为0.0~6.0
         
-        int blur_type = [NSString stringWithFormat:@"%@",call.arguments[@"blur_type"]].intValue;
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"blur_level"]].doubleValue;
-        [FUManager shareManager].blurType = blur_type;
-        if (blur_type == 0) {
-            [FUManager shareManager].blurLevel_0 = level; //磨皮 (0.0 - 6.0)
-        }else if (blur_type == 1){
-            [FUManager shareManager].blurLevel_1 = level; //磨皮 (0.0 - 6.0)
-        }else if (blur_type == 2){
-            [FUManager shareManager].blurLevel_2 = level; //磨皮 (0.0 - 6.0)
-        }
+    //     int blur_type = [NSString stringWithFormat:@"%@",call.arguments[@"blur_type"]].intValue;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"blur_level"]].doubleValue;
+    //     [FUManager shareManager].blurType = blur_type;
+    //     if (blur_type == 0) {
+    //         [FUManager shareManager].blurLevel_0 = level; //磨皮 (0.0 - 6.0)
+    //     }else if (blur_type == 1){
+    //         [FUManager shareManager].blurLevel_1 = level; //磨皮 (0.0 - 6.0)
+    //     }else if (blur_type == 2){
+    //         [FUManager shareManager].blurLevel_2 = level; //磨皮 (0.0 - 6.0)
+    //     }
         
-    }else if ([@"skin_detect" isEqualToString:call.method]) {// 指定是否开启皮肤检测,该参数的推荐取值为0-1，0为无效果，1为开启皮肤检测，
+    // }else if ([@"skin_detect" isEqualToString:call.method]) {// 指定是否开启皮肤检测,该参数的推荐取值为0-1，0为无效果，1为开启皮肤检测，
         
-        BOOL enable = [NSString stringWithFormat:@"%@",call.arguments[@"skin_detect"]].boolValue;
-        [FUManager shareManager].skinDetectEnable = enable;
+    //     BOOL enable = [NSString stringWithFormat:@"%@",call.arguments[@"skin_detect"]].boolValue;
+    //     [FUManager shareManager].skinDetectEnable = enable;
         
-    }else if ([@"nonshin_blur_scale" isEqualToString:call.method]) {// 指定开启皮肤检测后，非皮肤区域减轻磨皮导致模糊的程度。该参数范围是[0.0,1.0]
+    // }else if ([@"nonshin_blur_scale" isEqualToString:call.method]) {// 指定开启皮肤检测后，非皮肤区域减轻磨皮导致模糊的程度。该参数范围是[0.0,1.0]
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"nonshin_blur_scale"]].doubleValue;
-        [FURenderer itemSetParam:0 withName:@"nonshin_blur_scale" value:@(level)];
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"nonshin_blur_scale"]].doubleValue;
+    //     [FURenderer itemSetParam:0 withName:@"nonshin_blur_scale" value:@(level)];
         
-    }else if ([@"heavy_blur" isEqualToString:call.method]) {// 指定是否开启朦胧美肤功能。大于1开启朦胧美肤功能。
+    // }else if ([@"heavy_blur" isEqualToString:call.method]) {// 指定是否开启朦胧美肤功能。大于1开启朦胧美肤功能。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"heavy_blur"]].doubleValue;
-        [FURenderer itemSetParam:0 withName:@"heavy_blur" value:@(level)];
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"heavy_blur"]].doubleValue;
+    //     [FURenderer itemSetParam:0 withName:@"heavy_blur" value:@(level)];
         
-    }else if ([@"blur_blend_ratio" isEqualToString:call.method]) {// 指定磨皮结果和原图融合率。该参数的推荐取值范围为0-1。
+    // }else if ([@"blur_blend_ratio" isEqualToString:call.method]) {// 指定磨皮结果和原图融合率。该参数的推荐取值范围为0-1。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"blur_blend_ratio"]].doubleValue;
-        [FURenderer itemSetParam:0 withName:@"blur_blend_ratio" value:@(level)];
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"blur_blend_ratio"]].doubleValue;
+    //     [FURenderer itemSetParam:0 withName:@"blur_blend_ratio" value:@(level)];
         
-    }else if ([@"eye_bright" isEqualToString:call.method]) {// 亮眼
+    // }else if ([@"eye_bright" isEqualToString:call.method]) {// 亮眼
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"eye_bright"]].doubleValue;
-        [FUManager shareManager].eyelightingLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"eye_bright"]].doubleValue;
+    //     [FUManager shareManager].eyelightingLevel = level;
         
-    }else if ([@"tooth_whiten" isEqualToString:call.method]) {// 美牙
+    // }else if ([@"tooth_whiten" isEqualToString:call.method]) {// 美牙
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"tooth_whiten"]].doubleValue;
-        [FUManager shareManager].beautyToothLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"tooth_whiten"]].doubleValue;
+    //     [FUManager shareManager].beautyToothLevel = level;
         
-    }else if ([@"face_shape" isEqualToString:call.method]) {// 美型支持四种基本美型：女神、网红、自然、默认   一种高级美型：自定义。
+    // }else if ([@"face_shape" isEqualToString:call.method]) {// 美型支持四种基本美型：女神、网红、自然、默认   一种高级美型：自定义。
         
-        NSInteger level = [NSString stringWithFormat:@"%@",call.arguments[@"face_shape"]].integerValue;
-        [FUManager shareManager].faceShape = level;
+    //     NSInteger level = [NSString stringWithFormat:@"%@",call.arguments[@"face_shape"]].integerValue;
+    //     [FUManager shareManager].faceShape = level;
         
-    }else if ([@"face_shape_level" isEqualToString:call.method]) {// 用以控制变化到指定基础脸型的程度。
+    // }else if ([@"face_shape_level" isEqualToString:call.method]) {// 用以控制变化到指定基础脸型的程度。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"face_shape_level"]].doubleValue;
-        [FURenderer itemSetParam:0 withName:@"face_shape_level" value:@(level)];
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"face_shape_level"]].doubleValue;
+    //     [FURenderer itemSetParam:0 withName:@"face_shape_level" value:@(level)];
         
-    }else if ([@"eye_enlarging" isEqualToString:call.method]) {// 用以控制眼睛大小。此参数受参数 face_shape_level 影响。
+    // }else if ([@"eye_enlarging" isEqualToString:call.method]) {// 用以控制眼睛大小。此参数受参数 face_shape_level 影响。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"eye_enlarging"]].doubleValue;
-        [FUManager shareManager].enlargingLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"eye_enlarging"]].doubleValue;
+    //     [FUManager shareManager].enlargingLevel = level;
         
-    }else if ([@"cheek_thinning" isEqualToString:call.method]) {// 用以控制脸大小。此参数受参数 face_shape_level 影响。
+    // }else if ([@"cheek_thinning" isEqualToString:call.method]) {// 用以控制脸大小。此参数受参数 face_shape_level 影响。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"cheek_thinning"]].doubleValue;
-        [FUManager shareManager].thinningLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"cheek_thinning"]].doubleValue;
+    //     [FUManager shareManager].thinningLevel = level;
         
-    }else if ([@"intensity_forehead" isEqualToString:call.method]) {// 额头调整。
+    // }else if ([@"intensity_forehead" isEqualToString:call.method]) {// 额头调整。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_forehead"]].doubleValue;
-        [FUManager shareManager].foreheadLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_forehead"]].doubleValue;
+    //     [FUManager shareManager].foreheadLevel = level;
         
-    }else if ([@"intensity_chin" isEqualToString:call.method]) {// 下巴调整。
+    // }else if ([@"intensity_chin" isEqualToString:call.method]) {// 下巴调整。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_chin"]].doubleValue;
-        [FUManager shareManager].jewLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_chin"]].doubleValue;
+    //     [FUManager shareManager].jewLevel = level;
         
-    }else if ([@"intensity_nose" isEqualToString:call.method]) {// 瘦鼻。
+    // }else if ([@"intensity_nose" isEqualToString:call.method]) {// 瘦鼻。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_nose"]].doubleValue;
-        [FUManager shareManager].noseLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_nose"]].doubleValue;
+    //     [FUManager shareManager].noseLevel = level;
         
-    }else if ([@"intensity_mouth" isEqualToString:call.method]) {// 嘴型。
+    // }else if ([@"intensity_mouth" isEqualToString:call.method]) {// 嘴型。
         
-        double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_mouth"]].doubleValue;
-        [FUManager shareManager].mouthLevel = level;
+    //     double level = [NSString stringWithFormat:@"%@",call.arguments[@"intensity_mouth"]].doubleValue;
+    //     [FUManager shareManager].mouthLevel = level;
         
-    }else if ([@"destoryItems" isEqualToString:call.method]) {// 销毁道具。
+    // }else if ([@"destoryItems" isEqualToString:call.method]) {// 销毁道具。
         
-        [[FUManager shareManager] destoryItems];
+    //     [[FUManager shareManager] destoryItems];
         
-    }else {
+    // }
+    else {
         result(FlutterMethodNotImplemented);
     }
     
@@ -601,16 +603,16 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 // 发起通话
 - (void)processVideoCallWithBuffer:(CMSampleBufferRef)sampleBuffer
 {
-    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    [[FUManager shareManager] renderItemsToPixelBuffer:pixelBuffer];
-    [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
+    // CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // [[FUManager shareManager] renderItemsToPixelBuffer:pixelBuffer];
+    // [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
 }
 // 接听通话
 - (void)responVideoCallWithBuffer:(CMSampleBufferRef)sampleBuffer
 {
-    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    [[FUManager shareManager] renderItemsToPixelBuffer:pixelBuffer];
-    [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
+    // CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // [[FUManager shareManager] renderItemsToPixelBuffer:pixelBuffer];
+    // [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
 }
 
 
