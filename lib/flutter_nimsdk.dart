@@ -145,6 +145,16 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("deleteRecentSession",{"sessionID": sessionID});
   }
 
+  /// 删除所有最近会话
+  Future<void> deleteAllRecentSession() async {
+    return await _channel.invokeMethod("deleteAllRecentSession");
+  }
+
+  /// 获取所有未读数
+  Future<String> allUnreadCount() async {
+    return await _channel.invokeMethod("allUnreadCount");
+  }
+
   ///发送文本消息
   Future<void> sendMessageText(String text,NIMSession nimSession) async {
     return await _channel.invokeMethod("sendTextMessage",{"message":text,"nimSession":nimSession.toJson()});
@@ -232,6 +242,8 @@ class FlutterNimsdk {
   Future<void> deleteAllMessages(NIMDeleteMessagesOption option) async {
     return await _channel.invokeMethod("deleteAllMessages",option.toJson());
   }
+
+
 
   /// 美颜
   /// 初始化

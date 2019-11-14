@@ -360,6 +360,26 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             }
         }
         
+    }else if ([@"deleteAllRecentSession" isEqualToString:call.method]) { //删除所有最近会话
+        
+        for (NIMRecentSession *session in self.sessions) {
+            [[NIMSDK sharedSDK].conversationManager deleteRecentSession:session];
+        }
+        
+    }else if ([@"messagesInSession" isEqualToString:call.method]) { //获取会话所有消息
+        
+        NSDictionary *args = call.arguments;
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        NSArray *messageIds = args[@"messageIds"];
+        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:messageIds];
+        NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
+        result([[NimDataManager shared] dictionaryToJson:@{@"messages": messageDics}]);
+        
+    }else if ([@"allUnreadCount" isEqualToString:call.method]) { //获取所有未读
+        
+        NSInteger count = [[NIMSDK sharedSDK].conversationManager allUnreadCount];
+        result([NSString stringWithFormat:@"%ld",(long)count]);
+        
     }else if ([@"sendTextMessage" isEqualToString:call.method]) {//文本
         
         [self sendMessage:NIMMessageTypeText args:call.arguments];
