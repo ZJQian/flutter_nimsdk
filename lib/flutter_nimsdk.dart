@@ -128,6 +128,12 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("setMute",{"mute": mute});
   }
 
+  /// 设置网络通话扬声器模式
+  Future<void> setSpeaker(bool useSpeaker) async {
+
+    return await _channel.invokeMethod("setSpeaker",{"speaker": useSpeaker});
+  }
+
   /// IM 
   /// 最近会话列表
   Future<String> mostRecentSessions() async {

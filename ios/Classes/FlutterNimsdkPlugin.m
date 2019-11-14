@@ -316,12 +316,19 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         }
         [[NIMAVChatSDK sharedSDK].netCallManager switchCamera:position];
         
-    }else if ([@"setMute" isEqualToString:call.method]) {//动态设置摄像头开关
+    }else if ([@"setMute" isEqualToString:call.method]) {//设置静音
         
         NSDictionary *args = call.arguments;
         BOOL isMute = args[@"mute"];
         //开启静音 YES  关闭静音 No
         [[NIMAVChatSDK sharedSDK].netCallManager setMute:isMute];
+        
+    } else if ([@"setSpeaker" isEqualToString:call.method]) {//设置扬声器
+        
+        NSDictionary *args = call.arguments;
+        BOOL isSpeaker = args[@"speaker"];
+        //开启扬声器  YES
+        [[NIMAVChatSDK sharedSDK].netCallManager setSpeaker:isSpeaker];
         
     } else if ([@"mostRecentSessions" isEqualToString:call.method]) { //获取所有最近100条会话
         
