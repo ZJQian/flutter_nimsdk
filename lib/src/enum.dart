@@ -88,3 +88,8 @@ enum FilterNameType {
   nuansediao2,
   nuansediao3,
 }
+
+enum NIMMessageSearchOrder {
+  desc,//从新消息往旧消息查询
+  asc//从旧消息往新消息查询
+}

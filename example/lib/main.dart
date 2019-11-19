@@ -18,13 +18,13 @@ class _MyAppState extends State<MyApp> {
 
   //  28   f51d1656315ac021d623f556dd493985
   //  27   ae93a01e9a3f087e1e85a7de731955dc
-  // int zhujiaoID = 27;
-  // String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
-  // int beijiaoID = 28;
+  int zhujiaoID = 27;
+  String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
+  int beijiaoID = 28;
 
-  int zhujiaoID = 28;
-  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  int beijiaoID = 27;
+  // int zhujiaoID = 28;
+  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  // int beijiaoID = 27;
   
   String callID = "";
 
@@ -112,7 +112,7 @@ class _MyAppState extends State<MyApp> {
   /// 主叫发起通话请求
   void start() {
     NIMNetCallOption callOption = NIMNetCallOption(extendMessage: "extendMessage",apnsContent: "apnsContent",apnsSound: "apnsSound");
-    FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Audio, callOption).then((result) {
+    FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Video, callOption).then((result) {
         print(result);
     });
   }
@@ -198,6 +198,7 @@ class _MyAppState extends State<MyApp> {
               controller: controller,
               child: Column(
                 children: <Widget>[
+                  Text(zhujiaoID.toString()),
                   RaisedButton(
                     onPressed: (){
                       this.login();
@@ -321,6 +322,11 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text("设置全部已读"),
                   ),
+                  Container(
+                    width: 300,
+                    height: 400,
+                    child: UiKitView(viewType: "LocalDisplayView",),
+                  )
                 ],
               ),
             ),

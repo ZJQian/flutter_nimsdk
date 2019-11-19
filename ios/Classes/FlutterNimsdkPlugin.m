@@ -3,6 +3,8 @@
 #import <NIMAVChat/NIMAVChat.h>
 #import <MJExtension/MJExtension.h>
 #import "NimDataManager.h"
+#import "VideoChat/VideoChatViewController.h"
+#import "FlutterNimViewFactory.h"
 //#import "FaceunityManager/FUManager.h"
 
 
@@ -26,7 +28,9 @@ typedef enum : NSUInteger {
                                  NIMConversationManagerDelegate,
                                  NIMChatManagerDelegate,
                                  NIMMediaManagerDelegate>
-
+{
+    NSObject<FlutterPluginRegistrar>*  _registrar;
+}
 @property(nonatomic) FlutterEventSink eventSink;
 @property(nonatomic, strong) FlutterMethodChannel *methodChannel;
 @property(nonatomic, strong) NSMutableArray *sessions;
@@ -36,6 +40,13 @@ typedef enum : NSUInteger {
 
 /// sessionID
 @property(nonatomic, copy) NSString *sessionID;
+
+
+
+@property(nonatomic, strong) UIView *localDisplayView;
+@property(nonatomic, strong) UIView *remoteDisplayView;
+
+
 
 @end
 
@@ -65,13 +76,16 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     [[[NIMSDK sharedSDK] chatManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:instance];
 
-    [instance initChannel:[registrar messenger]];
+    [instance initChannel:registrar];
+    
 }
 
 ///处理 flutter 向 native 发送的一些消息
-- (void)initChannel:(NSObject<FlutterBinaryMessenger> *)messenger {
+- (void)initChannel:(NSObject<FlutterPluginRegistrar>*)registrar {
     
-    self.methodChannel = [FlutterMethodChannel methodChannelWithName:kMethodChannelName binaryMessenger:messenger];
+    _registrar = registrar;
+    __weak typeof(self) weakSelf = self;
+    self.methodChannel = [FlutterMethodChannel methodChannelWithName:kMethodChannelName binaryMessenger:[registrar messenger]];
     [self.methodChannel setMethodCallHandler:^(FlutterMethodCall * _Nonnull call, FlutterResult  _Nonnull result) {
         if ([call.method isEqualToString:@"response"]) {//调用哪个方法
             
@@ -95,6 +109,13 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 //链接成功
                 if (!error) {
                     
+                    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+                    VideoChatViewController *vc = [[VideoChatViewController alloc] init];
+                    vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                    vc.localDisplayView = weakSelf.localDisplayView;
+                    vc.remoteDisplayView = weakSelf.remoteDisplayView;
+                    [window.rootViewController presentViewController:vc animated:YES completion:nil];
+                    
                     result(nil);
                 }else{//链接失败
                     
@@ -104,7 +125,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                     result([[NimDataManager shared] dictionaryToJson:dic]);
                 }
             }];
-            result([NSString stringWithFormat:@"MethodChannel:收到Dart消息：%@",call.arguments]);
+//            result([NSString stringWithFormat:@"MethodChannel:收到Dart消息：%@",call.arguments]);
         }
     }];
 }
@@ -170,6 +191,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             [NIMSDKConfig sharedConfig].customTag = result;
         }];
         
+        
         result(nil);
     }else if([@"login" isEqualToString: call.method]){// 登陆
         
@@ -214,13 +236,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         NSDictionary *args = call.arguments;
         NSString *callees = args[@"callees"];
-        NIMNetCallMediaType nimNetCallMediaType = NIMNetCallMediaTypeVideo;
-        NSString *type = args[@"type"];
-        if ([type isEqualToString: @"video"]) {
-            nimNetCallMediaType = NIMNetCallMediaTypeVideo;
-        }else {
-            nimNetCallMediaType = NIMNetCallMediaTypeAudio;
-        }
+        int type = [NSString stringWithFormat:@"%@",args[@"type"]].intValue;
         NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
         option.extendMessage = args[@"options"][@"extendMessage"];
         option.apnsContent = args[@"options"][@"apnsContent"];
@@ -249,7 +265,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 
 
         //开始通话
-        [[NIMAVChatSDK sharedSDK].netCallManager start:@[callees] type:nimNetCallMediaType option:option completion:^(NSError *error, UInt64 callID) {
+        [[NIMAVChatSDK sharedSDK].netCallManager start:@[callees] type:(type+1) option:option completion:^(NSError *error, UInt64 callID) {
             if (!error) {
                     //通话发起成功
                 
@@ -464,6 +480,25 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NIMDeleteMessagesOption *option = [NIMDeleteMessagesOption mj_objectWithKeyValues:call.arguments];
         [[[NIMSDK sharedSDK] conversationManager] deleteAllMessages:option];
         
+    }else if ([@"fetchMessageHistory" isEqualToString:call.method]) {// 从服务器上获取一个会话里某条消息之前的若干条的消息
+        
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:call.arguments[@"session"]];
+        NIMHistoryMessageSearchOption *option = [NIMHistoryMessageSearchOption mj_objectWithKeyValues:call.arguments[@"option"]];
+        [[[NIMSDK sharedSDK] conversationManager] fetchMessageHistory:session option:option result:^(NSError * _Nullable error, NSArray<NIMMessage *> * _Nullable messages) {
+            
+            if (error == nil) {
+                
+                NSArray *array = [NIMMessage mj_keyValuesArrayWithObjectArray: messages];
+                NSDictionary *dic = @{@"messages": array};
+                result([[NimDataManager shared] dictionaryToJson:dic]);
+                
+            }else{
+                NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"获取聊天记录失败" : error.userInfo[@"NSLocalizedDescription"];
+                NSDictionary *dic = @{@"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code]};
+                result([[NimDataManager shared] dictionaryToJson:dic]);
+            }
+        }];
+        
     }
     // else if ([@"initFaceunity" isEqualToString:call.method]) {// Faceunity初始化
         
@@ -632,7 +667,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 {
     // CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     // [[FUManager shareManager] renderItemsToPixelBuffer:pixelBuffer];
-    // [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
+     [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
 }
 // 接听通话
 - (void)responVideoCallWithBuffer:(CMSampleBufferRef)sampleBuffer
@@ -823,6 +858,26 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                               @"error": msg};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
+}
+
+- (void)onLocalDisplayviewReady:(UIView *)displayView {
+    
+    NSLog(@"onLocalDisplayviewReady == %@",displayView);
+    self.localDisplayView = displayView;
+    
+    
+//    FlutterNimViewFactory *factory = [[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger]];
+//    [_registrar registerViewFactory:factory withId:@"LocalDisplayView"];
+
+}
+
+- (void)onRemoteDisplayviewReady:(UIView *)displayView user:(NSString *)user {
+    
+    NSLog(@"onRemoteDisplayviewReady == %@, user == %@",displayView,user);
+    self.remoteDisplayView = displayView;
+    
+//    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:@"RemoteDisplayView"];
+
 }
 
 // MARK: - NIMConversationManagerDelegate

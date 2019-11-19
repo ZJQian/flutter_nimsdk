@@ -10,6 +10,8 @@ import 'src/nim_session_model.dart';
 export 'src/nim_session_model.dart';
 import 'src/nim_message_model.dart';
 export 'src/nim_message_model.dart';
+import 'src/nim_history_message_search_option.dart';
+export 'src/nim_history_message_search_option.dart';
 
 class FlutterNimsdk {
 
@@ -80,13 +82,7 @@ class FlutterNimsdk {
 
   /// 主叫发起通话请求
   Future<String> start(String callees,NIMNetCallMediaType type,NIMNetCallOption option) async {
-    String netCallMediaType = "video";
-    if (type == NIMNetCallMediaType.Video) {
-      netCallMediaType = "video";
-    }else {
-      netCallMediaType = "audio";
-    }
-    return await _channel.invokeMethod("start",{"callees":callees, "type": netCallMediaType, "options": option.toJson()});
+    return await _channel.invokeMethod("start",{"callees":callees, "type": type.index, "options": option.toJson()});
   }
 
   /// 挂断
@@ -247,6 +243,11 @@ class FlutterNimsdk {
   /// 删除所有会话消息
   Future<void> deleteAllMessages(NIMDeleteMessagesOption option) async {
     return await _channel.invokeMethod("deleteAllMessages",option.toJson());
+  }
+
+  ///从服务器上获取一个会话里某条消息之前的若干条的消息
+  Future<String> fetchMessageHistory(NIMSession session,NIMHistoryMessageSearchOption option) async {
+    return await _channel.invokeMethod("fetchMessageHistory",{"session":session.toJson(),"option": option.toJson()});
   }
 
 
