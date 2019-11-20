@@ -130,6 +130,11 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("setSpeaker",{"speaker": useSpeaker});
   }
 
+  /// 设置视频通话对方的窗口的大小
+  Future<void> setRemoteViewLayout(double originX,double originY, double width, double height) async {
+    return await _channel.invokeMethod("setRemoteViewLayout",{"originX": originX,"originY":originY,"width":width,"height":height});
+  }
+
   /// IM 
   /// 最近会话列表
   Future<String> mostRecentSessions() async {

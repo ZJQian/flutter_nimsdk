@@ -46,6 +46,9 @@ typedef enum : NSUInteger {
 @property(nonatomic, strong) UIView *localDisplayView;
 @property(nonatomic, strong) UIView *remoteDisplayView;
 
+@property (nonatomic, strong)VideoChatViewController *videoChatViewController;
+
+
 
 
 @end
@@ -99,22 +102,26 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             option.videoCaptureParam = param;
             
             NSDictionary *args = call.arguments;
-            NSString *callidStr = args[@"callID"];
+            NSString *callidStr = args[@"response"][@"callID"];
             
             UInt64 callid = [callidStr longLongValue];
-            BOOL accept = [NSString stringWithFormat:@"%@",args[@"accept"]].boolValue;
+            BOOL accept = [NSString stringWithFormat:@"%@",args[@"response"][@"accept"]].boolValue;
             
+            int mediaType = [NSString stringWithFormat:@"%@",args[@"mediaType"]].intValue;
             [[NIMAVChatSDK sharedSDK].netCallManager response:callid accept:accept option:option completion:^(NSError * _Nullable error, UInt64 callID) {
                 
                 //链接成功
                 if (!error) {
                     
-                    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-                    VideoChatViewController *vc = [[VideoChatViewController alloc] init];
-                    vc.modalPresentationStyle = UIModalPresentationFullScreen;
-                    vc.localDisplayView = weakSelf.localDisplayView;
-                    vc.remoteDisplayView = weakSelf.remoteDisplayView;
-                    [window.rootViewController presentViewController:vc animated:YES completion:nil];
+                    if (mediaType == 1) {
+                        UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+                        weakSelf.videoChatViewController = [[VideoChatViewController alloc] init];
+                        weakSelf.videoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+                        weakSelf.videoChatViewController.localDisplayView = weakSelf.localDisplayView;
+                        weakSelf.videoChatViewController.remoteDisplayView = weakSelf.remoteDisplayView;
+                        [window.rootViewController presentViewController:weakSelf.videoChatViewController animated:YES completion:nil];
+                    }
+                    
                     
                     result(nil);
                 }else{//链接失败
@@ -273,7 +280,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 
             }else{
                     //通话发起失败
-                NSDictionary *dic = @{@"callID": [NSNumber numberWithInteger:callID],@"msg": @"通话发起失败"};
+                NSDictionary *dic = @{@"callID": [NSNumber numberWithLongLong:callID],@"msg": @"通话发起失败"};
                 result([[NimDataManager shared] dictionaryToJson:dic]);
             }
         }];
@@ -285,6 +292,19 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
         [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
+        if (self.videoChatViewController != nil) {
+            [self.videoChatViewController dismissViewControllerAnimated:true completion:nil];
+        }
+        
+    }else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
+        
+        NSDictionary *args = call.arguments;
+        double originX = [NSString stringWithFormat:@"%@",args[@"originX"]].doubleValue;
+        double originY = [NSString stringWithFormat:@"%@",args[@"originY"]].doubleValue;
+        double width = [NSString stringWithFormat:@"%@",args[@"width"]].doubleValue;
+        double height = [NSString stringWithFormat:@"%@",args[@"height"]].doubleValue;
+        
+        self.videoChatViewController.remoteDisplayView.frame = CGRectMake(originX, originY, width, height);
         
     }else if ([@"records" isEqualToString:call.method]) { // 获取话单
         
@@ -316,7 +336,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     } else if ([@"setCameraDisable" isEqualToString:call.method]) {//动态设置摄像头开关
         
         NSDictionary *args = call.arguments;
-        BOOL isDisable = args[@"disable"];
+        BOOL isDisable = [NSString stringWithFormat:@"%@",args[@"disable"]].boolValue;
         //打开摄像头 false    关闭摄像头  true
         [[NIMAVChatSDK sharedSDK].netCallManager setCameraDisable:isDisable];
         
@@ -335,14 +355,14 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     }else if ([@"setMute" isEqualToString:call.method]) {//设置静音
         
         NSDictionary *args = call.arguments;
-        BOOL isMute = args[@"mute"];
+        BOOL isMute = [NSString stringWithFormat:@"%@",args[@"mute"]].boolValue;
         //开启静音 YES  关闭静音 No
         [[NIMAVChatSDK sharedSDK].netCallManager setMute:isMute];
         
     } else if ([@"setSpeaker" isEqualToString:call.method]) {//设置扬声器
         
         NSDictionary *args = call.arguments;
-        BOOL isSpeaker = args[@"speaker"];
+        BOOL isSpeaker = [NSString stringWithFormat:@"%@",args[@"speaker"]].boolValue;
         //开启扬声器  YES
         [[NIMAVChatSDK sharedSDK].netCallManager setSpeaker:isSpeaker];
         
@@ -674,7 +694,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 {
     // CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     // [[FUManager shareManager] renderItemsToPixelBuffer:pixelBuffer];
-    // [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
+     [[NIMAVChatSDK sharedSDK].netCallManager sendVideoSampleBuffer:sampleBuffer];
 }
 
 
@@ -864,10 +884,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     NSLog(@"onLocalDisplayviewReady == %@",displayView);
     self.localDisplayView = displayView;
-    
-    
-//    FlutterNimViewFactory *factory = [[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger]];
-//    [_registrar registerViewFactory:factory withId:@"LocalDisplayView"];
 
 }
 
@@ -875,9 +891,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     NSLog(@"onRemoteDisplayviewReady == %@, user == %@",displayView,user);
     self.remoteDisplayView = displayView;
-    
-//    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:@"RemoteDisplayView"];
-
 }
 
 // MARK: - NIMConversationManagerDelegate

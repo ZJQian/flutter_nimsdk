@@ -120,7 +120,7 @@ class _MyAppState extends State<MyApp> {
   ///被叫响应通话请求
   void response(bool accept) {
     NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
-    FlutterNimsdk().methodChannelPlugin().invokeMethod('response', nimResponse.toJson()).then((result) {
+    FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
         print(result);
     });
   }
