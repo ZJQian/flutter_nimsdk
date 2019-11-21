@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_nimsdk/flutter_nimsdk.dart';
 import 'dart:convert';
-
+import 'package:flutter_alert/flutter_alert.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,13 +18,13 @@ class _MyAppState extends State<MyApp> {
 
   //  28   f51d1656315ac021d623f556dd493985
   //  27   ae93a01e9a3f087e1e85a7de731955dc
-  int zhujiaoID = 27;
-  String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
-  int beijiaoID = 28;
+  // int zhujiaoID = 27;
+  // String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
+  // int beijiaoID = 28;
 
-  // int zhujiaoID = 28;
-  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 27;
+  int zhujiaoID = 28;
+  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  int beijiaoID = 27;
   
   String callID = "";
 
@@ -80,7 +80,6 @@ class _MyAppState extends State<MyApp> {
   void _onError(dynamic) {
     print("on error");
   }
-
 
 // 注册
   void registerNIMSDK(String appkey) async {
@@ -182,6 +181,7 @@ class _MyAppState extends State<MyApp> {
   void markAllMessagesRead() async {
     FlutterNimsdk().markAllMessagesRead();
   }
+
   
   @override
   Widget build(BuildContext context) {
@@ -321,11 +321,6 @@ class _MyAppState extends State<MyApp> {
                       this.markAllMessagesRead();
                     },
                     child: Text("设置全部已读"),
-                  ),
-                  Container(
-                    width: 300,
-                    height: 400,
-                    child: UiKitView(viewType: "LocalDisplayView",),
                   )
                 ],
               ),

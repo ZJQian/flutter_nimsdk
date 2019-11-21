@@ -135,6 +135,11 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("setRemoteViewLayout",{"originX": originX,"originY":originY,"width":width,"height":height});
   }
 
+  /// 视频页面模态消失
+  Future<void> dismissVideo() async {
+    return await _channel.invokeMethod("dismissVideo");
+  }
+
   /// IM 
   /// 最近会话列表
   Future<String> mostRecentSessions() async {

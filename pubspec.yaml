@@ -1,6 +1,6 @@
 name: flutter_nimsdk
 description: It encapsulates the plugins of NIMSDK. Currently, it only supports IOS version. It includes audio and video call message processing and im basic function integration.
-version: 1.2.7
+version: 1.2.8
 homepage: https://github.com/ZJQian/flutter_nimsdk
 
 environment:

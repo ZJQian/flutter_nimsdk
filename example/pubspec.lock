@@ -69,13 +69,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_alert:
+    dependency: "direct main"
+    description:
+      name: flutter_alert
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.0"
   flutter_nimsdk:
     dependency: "direct dev"
     description:
       path: ".."
       relative: true
     source: path
-    version: "1.2.7"
+    version: "1.2.8"
   flutter_test:
     dependency: "direct dev"
     description: flutter
