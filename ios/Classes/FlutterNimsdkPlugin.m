@@ -277,13 +277,14 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             [self processVideoCallWithBuffer:sampleBuffer];
         };
 
-        self.mediaType = type+1;
+        self.mediaType = type+1; 
         //开始通话
         [[NIMAVChatSDK sharedSDK].netCallManager start:@[callees] type:(type+1) option:option completion:^(NSError *error, UInt64 callID) {
             if (!error) {
                     //通话发起成功
                 
-                result(nil);
+                NSDictionary *dic = @{@"callID": [NSNumber numberWithLongLong:callID],@"msg": @"通话发起成功"};
+                result([[NimDataManager shared] dictionaryToJson:dic]);
                 
             }else{
                     //通话发起失败

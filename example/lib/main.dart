@@ -126,7 +126,7 @@ class _MyAppState extends State<MyApp> {
 
   /// 挂断
   void hangup() async {
-    await FlutterNimsdk().hangup("callid");
+    await FlutterNimsdk().hangup("0");
   }
 
   /// 获取话单
