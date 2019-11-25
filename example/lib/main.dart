@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_nimsdk/flutter_nimsdk.dart';
 import 'dart:convert';
 import 'package:flutter_alert/flutter_alert.dart';
+import 'video.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,7 +14,28 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  StreamSubscription _streamSubscription;
+  @override
+  Widget build(BuildContext context) {
+
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Plugin example app'),
+        ),
+        body: HomeWidget()
+      ),
+    );
+  }
+}
+
+class HomeWidget extends StatefulWidget {
+  @override
+  _HomeWidgetState createState() => _HomeWidgetState();
+}
+
+class _HomeWidgetState extends State<HomeWidget>{
+
+   StreamSubscription _streamSubscription;
   ScrollController controller = ScrollController();
 
   //  28   f51d1656315ac021d623f556dd493985
@@ -117,10 +139,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   ///被叫响应通话请求
-  void response(bool accept) {
+  void response(BuildContext context,bool accept) {
     NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
     FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
-        print(result);
+        
+        Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage()));
     });
   }
 
@@ -182,17 +205,14 @@ class _MyAppState extends State<MyApp> {
     FlutterNimsdk().markAllMessagesRead();
   }
 
-  
+
   @override
   Widget build(BuildContext context) {
-
-
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: SafeArea(
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Flutter Text"),
+      ),
+      body: new SafeArea(
           child: Center(
             child: SingleChildScrollView(
               controller: controller,
@@ -252,13 +272,13 @@ class _MyAppState extends State<MyApp> {
                           children: <Widget>[
                             RaisedButton(
                               onPressed: () {
-                                this.response(true);
+                                this.response(context,true);
                               },
                               child: Text("接听"),
                             ),
                             RaisedButton(
                               onPressed: (){
-                                this.response(false);
+                                this.response(context,false);
                               },
                               child: Text("拒绝接听"),
                             ),
@@ -326,8 +346,8 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
           ),
-        )
-      ),
+        ),
     );
   }
 }
+

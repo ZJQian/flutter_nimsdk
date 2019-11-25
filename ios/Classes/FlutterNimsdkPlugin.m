@@ -89,7 +89,9 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)initChannel:(NSObject<FlutterPluginRegistrar>*)registrar {
     
     _registrar = registrar;
-    __weak typeof(self) weakSelf = self;
+    
+
+//    __weak typeof(self) weakSelf = self;
     self.methodChannel = [FlutterMethodChannel methodChannelWithName:kMethodChannelName binaryMessenger:[registrar messenger]];
     [self.methodChannel setMethodCallHandler:^(FlutterMethodCall * _Nonnull call, FlutterResult  _Nonnull result) {
         if ([call.method isEqualToString:@"response"]) {//调用哪个方法
@@ -117,15 +119,15 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                     
                     if (mediaType == 1) {
                         
-                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                            
-                            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-                            weakSelf.videoChatViewController = [[VideoChatViewController alloc] init];
-                            weakSelf.videoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-                            weakSelf.videoChatViewController.localDisplayView = weakSelf.localDisplayView;
-                            weakSelf.videoChatViewController.remoteDisplayView = weakSelf.remoteDisplayView;
-                            [window.rootViewController presentViewController:weakSelf.videoChatViewController animated:YES completion:nil];
-                        });
+//                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//
+//                            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+//                            weakSelf.videoChatViewController = [[VideoChatViewController alloc] init];
+//                            weakSelf.videoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+//                            weakSelf.videoChatViewController.localDisplayView = weakSelf.localDisplayView;
+//                            weakSelf.videoChatViewController.remoteDisplayView = weakSelf.remoteDisplayView;
+//                            [window.rootViewController presentViewController:weakSelf.videoChatViewController animated:YES completion:nil];
+//                        });
                         
                     }
                     
@@ -845,19 +847,19 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     if (self.eventSink) {
         
-        if (accepted && self.mediaType == NIMNetCallMediaTypeVideo) {
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                
-                UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-                self.zhujiaoVideoChatViewController = [[VideoChatViewController alloc] init];
-                self.zhujiaoVideoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-                self.zhujiaoVideoChatViewController.localDisplayView = self.localDisplayView;
-                self.zhujiaoVideoChatViewController.remoteDisplayView = self.remoteDisplayView;
-                [window.rootViewController presentViewController:self.zhujiaoVideoChatViewController animated:YES completion:nil];
-            });
-            
-        }
+//        if (accepted && self.mediaType == NIMNetCallMediaTypeVideo) {
+//
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//
+//                UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+//                self.zhujiaoVideoChatViewController = [[VideoChatViewController alloc] init];
+//                self.zhujiaoVideoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+//                self.zhujiaoVideoChatViewController.localDisplayView = self.localDisplayView;
+//                self.zhujiaoVideoChatViewController.remoteDisplayView = self.remoteDisplayView;
+//                [window.rootViewController presentViewController:self.zhujiaoVideoChatViewController animated:YES completion:nil];
+//            });
+//
+//        }
         
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnResponse],
                               @"callID": [NSString stringWithFormat:@"%llu",callID],
@@ -934,6 +936,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     NSLog(@"onLocalDisplayviewReady == %@",displayView);
     self.localDisplayView = displayView;
+    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:@"LocalDisplayView"];
 
 }
 
@@ -941,6 +944,9 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     NSLog(@"onRemoteDisplayviewReady == %@, user == %@",displayView,user);
     self.remoteDisplayView = displayView;
+    
+    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:@"RemoteDisplayView"];
+
 }
 
 // MARK: - NIMConversationManagerDelegate

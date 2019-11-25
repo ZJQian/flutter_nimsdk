@@ -18,10 +18,10 @@
         
         NSDictionary *dic = args;
         
-//        _displayView = displayView;
+        _displayView = displayView;
         
-        _displayView = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x, frame.origin.y, 100, 100)];
-        _displayView.backgroundColor = [UIColor orangeColor];
+//        _displayView = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x, frame.origin.y, 100, 100)];
+//        _displayView.backgroundColor = [UIColor orangeColor];
         
         _viewId = viewId;
         NSString* channelName = [NSString stringWithFormat:@"plugins/display_%lld", viewId];
