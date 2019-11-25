@@ -73,7 +73,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     FlutterEventChannel *eventChannel = [FlutterEventChannel eventChannelWithName: kEventChannelName binaryMessenger: [registrar messenger]];
     [eventChannel setStreamHandler: instance];
     
-    [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] loginManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] mediaManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] chatManager] addDelegate:instance];
@@ -268,6 +267,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             if (!error) {
                     //通话发起成功
                 
+                [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:self];
+
                 NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起成功"};
                 result([[NimDataManager shared] dictionaryToJson:dic]);
                 
@@ -285,6 +286,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
         [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
+        [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
         
     }else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
         

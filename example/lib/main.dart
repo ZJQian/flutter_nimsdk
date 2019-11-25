@@ -40,13 +40,13 @@ class _HomeWidgetState extends State<HomeWidget>{
 
   //  28   f51d1656315ac021d623f556dd493985
   //  27   ae93a01e9a3f087e1e85a7de731955dc
-  int zhujiaoID = 27;
-  String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
-  int beijiaoID = 28;
+  // int zhujiaoID = 27;
+  // String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
+  // int beijiaoID = 28;
 
-  // int zhujiaoID = 28;
-  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 27;
+  int zhujiaoID = 28;
+  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  int beijiaoID = 137604;
   
   String callID = "";
 
@@ -135,6 +135,7 @@ class _HomeWidgetState extends State<HomeWidget>{
     NIMNetCallOption callOption = NIMNetCallOption(extendMessage: "extendMessage",apnsContent: "apnsContent",apnsSound: "apnsSound");
     FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Video, callOption).then((result) {
         print(result);
+        callID = jsonDecode(result)["callID"].toString();
     });
   }
 
