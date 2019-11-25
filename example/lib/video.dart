@@ -11,12 +11,12 @@ class _VideoPageState extends State<VideoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-      width: window.physicalSize.width,
-      height: window.physicalSize.height,
-      child: UiKitView(
-        viewType: "LocalDisplayView",
+        width: window.physicalSize.width,
+        height: window.physicalSize.height,
+        child: UiKitView(
+          viewType: "LocalDisplayView",
+        ),
       ),
-    ),
     );
   }
 }

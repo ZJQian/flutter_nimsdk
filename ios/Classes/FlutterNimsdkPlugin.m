@@ -46,8 +46,6 @@ typedef enum : NSUInteger {
 @property(nonatomic, strong) UIView *localDisplayView;
 @property(nonatomic, strong) UIView *remoteDisplayView;
 
-@property (nonatomic, strong)VideoChatViewController *videoChatViewController;
-@property (nonatomic, strong)VideoChatViewController *zhujiaoVideoChatViewController;
 @property(nonatomic, assign) NIMNetCallMediaType mediaType;
 
 
@@ -111,31 +109,16 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             UInt64 callid = [callidStr longLongValue];
             BOOL accept = [NSString stringWithFormat:@"%@",args[@"response"][@"accept"]].boolValue;
             
-            int mediaType = [NSString stringWithFormat:@"%@",args[@"mediaType"]].intValue;
+//            int mediaType = [NSString stringWithFormat:@"%@",args[@"mediaType"]].intValue;
             [[NIMAVChatSDK sharedSDK].netCallManager response:callid accept:accept option:option completion:^(NSError * _Nullable error, UInt64 callID) {
                 
                 //链接成功
                 if (!error) {
                     
-                    if (mediaType == 1) {
-                        
-//                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//
-//                            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-//                            weakSelf.videoChatViewController = [[VideoChatViewController alloc] init];
-//                            weakSelf.videoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-//                            weakSelf.videoChatViewController.localDisplayView = weakSelf.localDisplayView;
-//                            weakSelf.videoChatViewController.remoteDisplayView = weakSelf.remoteDisplayView;
-//                            [window.rootViewController presentViewController:weakSelf.videoChatViewController animated:YES completion:nil];
-//                        });
-                        
-                    }
-                    
-                    
                     result(nil);
                 }else{//链接失败
                     
-                    NSDictionary *dic = @{@"callID": [NSNumber numberWithUnsignedLongLong:callID],
+                    NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],
                                           @"errorCode": [NSNumber numberWithInteger:error.code],
                                           @"msg": error.description};
                     result([[NimDataManager shared] dictionaryToJson:dic]);
@@ -285,12 +268,12 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             if (!error) {
                     //通话发起成功
                 
-                NSDictionary *dic = @{@"callID": [NSNumber numberWithLongLong:callID],@"msg": @"通话发起成功"};
+                NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起成功"};
                 result([[NimDataManager shared] dictionaryToJson:dic]);
                 
             }else{
                     //通话发起失败
-                NSDictionary *dic = @{@"callID": [NSNumber numberWithLongLong:callID],@"msg": @"通话发起失败"};
+                NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起失败"};
                 result([[NimDataManager shared] dictionaryToJson:dic]);
             }
         }];
@@ -302,19 +285,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
         [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
-        if (self.videoChatViewController != nil) {
-            [self.videoChatViewController dismissViewControllerAnimated:true completion:nil];
-        }
         
     }else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
-        
-        NSDictionary *args = call.arguments;
-        double originX = [NSString stringWithFormat:@"%@",args[@"originX"]].doubleValue;
-        double originY = [NSString stringWithFormat:@"%@",args[@"originY"]].doubleValue;
-        double width = [NSString stringWithFormat:@"%@",args[@"width"]].doubleValue;
-        double height = [NSString stringWithFormat:@"%@",args[@"height"]].doubleValue;
-        
-        self.videoChatViewController.remoteDisplayView.frame = CGRectMake(originX, originY, width, height);
         
     }else if ([@"records" isEqualToString:call.method]) { // 获取话单
         
@@ -528,16 +500,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 result([[NimDataManager shared] dictionaryToJson:dic]);
             }
         }];
-        
-    }else if ([@"dismissVideo" isEqualToString:call.method]) {// 视频页面模态消失
-        
-        if (self.videoChatViewController) {
-            [self.videoChatViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-        
-        if (self.zhujiaoVideoChatViewController) {
-            [self.zhujiaoVideoChatViewController dismissViewControllerAnimated:YES completion:nil];
-        }
         
     }
     // else if ([@"initFaceunity" isEqualToString:call.method]) {// Faceunity初始化
@@ -847,20 +809,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     if (self.eventSink) {
         
-//        if (accepted && self.mediaType == NIMNetCallMediaTypeVideo) {
-//
-//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//
-//                UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-//                self.zhujiaoVideoChatViewController = [[VideoChatViewController alloc] init];
-//                self.zhujiaoVideoChatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-//                self.zhujiaoVideoChatViewController.localDisplayView = self.localDisplayView;
-//                self.zhujiaoVideoChatViewController.remoteDisplayView = self.remoteDisplayView;
-//                [window.rootViewController presentViewController:self.zhujiaoVideoChatViewController animated:YES completion:nil];
-//            });
-//
-//        }
-        
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnResponse],
                               @"callID": [NSString stringWithFormat:@"%llu",callID],
                               @"callee": callee == nil ? @"" : callee,
@@ -888,15 +836,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     if (self.eventSink) {
         
-        
-        if (self.videoChatViewController) {
-            [self.videoChatViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-        
-        if (self.zhujiaoVideoChatViewController) {
-            [self.zhujiaoVideoChatViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-        
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnHangup],
                               @"callID": [NSString stringWithFormat:@"%llu",callID],
                               @"user": user == nil ? @"" : user};
@@ -914,15 +853,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)onCallDisconnected:(UInt64)callID withError:(NSError *)error {
     
     if (self.eventSink) {
-        
-        if (self.videoChatViewController) {
-            [self.videoChatViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-        
-        if (self.zhujiaoVideoChatViewController) {
-            [self.zhujiaoVideoChatViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-        
         
         NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"通话异常" : error.userInfo[@"NSLocalizedDescription"];
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnCallDisconnected],
