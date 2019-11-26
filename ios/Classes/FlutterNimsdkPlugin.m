@@ -77,6 +77,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     [[[NIMSDK sharedSDK] mediaManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] chatManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:instance];
+    [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:instance];
+
 
     [instance initChannel:registrar];
     
@@ -230,7 +232,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             //jump to login page
         }];
         
-    } else if([@"start" isEqualToString: call.method]){ // 发起通话
+    } else if([@"start" isEqualToString: call.method]){
+        // MARK: - 发起通话
         
         NSDictionary *args = call.arguments;
         NSString *callees = args[@"callees"];
@@ -261,32 +264,39 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             [self processVideoCallWithBuffer:sampleBuffer];
         };
 
-        self.mediaType = type+1; 
+        self.mediaType = type+1;
+
         //开始通话
         [[NIMAVChatSDK sharedSDK].netCallManager start:@[callees] type:(type+1) option:option completion:^(NSError *error, UInt64 callID) {
+            
+
             if (!error) {
                     //通话发起成功
                 
-                [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:self];
 
                 NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起成功"};
                 result([[NimDataManager shared] dictionaryToJson:dic]);
                 
             }else{
                     //通话发起失败
-                NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起失败"};
+                NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"通话发起失败" : error.userInfo[@"NSLocalizedDescription"];
+                NSDictionary *dic = @{@"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code],@"callID": [NSString stringWithFormat:@"%llu",callID]};
                 result([[NimDataManager shared] dictionaryToJson:dic]);
             }
         }];
         
-    } else if ([@"hangup" isEqualToString:call.method]) { //挂断
+    } else if ([@"hangup" isEqualToString:call.method]) {
+        // MARK: - 挂断
         
         NSDictionary *args = call.arguments;
         NSString *callID_str = args[@"callID"];
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
-        [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
         [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+            [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
+        });
         
     }else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
         
@@ -324,7 +334,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         //打开摄像头 false    关闭摄像头  true
         [[NIMAVChatSDK sharedSDK].netCallManager setCameraDisable:isDisable];
         
-    }else if ([@"switchCamera" isEqualToString:call.method]) {//动态切换摄像头前后
+    }else if ([@"switchCamera" isEqualToString:call.method]) {
+        // MARK: - //动态切换摄像头前后
         
         NSDictionary *args = call.arguments;
         NSString *camera = args[@"camera"];
@@ -336,21 +347,24 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         }
         [[NIMAVChatSDK sharedSDK].netCallManager switchCamera:position];
         
-    }else if ([@"setMute" isEqualToString:call.method]) {//设置静音
+    }else if ([@"setMute" isEqualToString:call.method]) {
+        // MARK: - //设置静音
         
         NSDictionary *args = call.arguments;
         BOOL isMute = [NSString stringWithFormat:@"%@",args[@"mute"]].boolValue;
         //开启静音 YES  关闭静音 No
         [[NIMAVChatSDK sharedSDK].netCallManager setMute:isMute];
         
-    } else if ([@"setSpeaker" isEqualToString:call.method]) {//设置扬声器
+    } else if ([@"setSpeaker" isEqualToString:call.method]) {
+        // MARK: -//设置扬声器
         
         NSDictionary *args = call.arguments;
         BOOL isSpeaker = [NSString stringWithFormat:@"%@",args[@"speaker"]].boolValue;
         //开启扬声器  YES
         [[NIMAVChatSDK sharedSDK].netCallManager setSpeaker:isSpeaker];
         
-    } else if ([@"mostRecentSessions" isEqualToString:call.method]) { //获取所有最近100条会话
+    } else if ([@"mostRecentSessions" isEqualToString:call.method]) {
+        // MARK: - //获取所有最近100条会话
         
         NSArray *recentSessions = [NIMSDK sharedSDK].conversationManager.mostRecentSessions;
         self.sessions = [NSMutableArray arrayWithArray:recentSessions];
@@ -363,7 +377,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSDictionary *dic = @{@"mostRecentSessions": array};
         result([[NimDataManager shared] dictionaryToJson:dic]);
         
-    }else if ([@"allRecentSessions" isEqualToString:call.method]) { // 获取所有最近100条会话
+    }else if ([@"allRecentSessions" isEqualToString:call.method]) {
+        // MARK: - // 获取所有最近100条会话
         
         NSArray *recentSessions = [NIMSDK sharedSDK].conversationManager.allRecentSessions;
         self.sessions = [NSMutableArray arrayWithArray:recentSessions];
@@ -377,7 +392,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSDictionary *dic = @{@"allRecentSessions": array};
         result([[NimDataManager shared] dictionaryToJson:dic]);
         
-    }else if ([@"deleteRecentSession" isEqualToString:call.method]) { //删除某个最近会话
+    }else if ([@"deleteRecentSession" isEqualToString:call.method]) {
+        // MARK: - //删除某个最近会话
         
         NSDictionary *args = call.arguments;
         NSString *sessionID = args[@"sessionID"];
@@ -387,13 +403,15 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             }
         }
         
-    }else if ([@"deleteAllRecentSession" isEqualToString:call.method]) { //删除所有最近会话
+    }else if ([@"deleteAllRecentSession" isEqualToString:call.method]) {
+        // MARK: - //删除所有最近会话
         
         for (NIMRecentSession *session in self.sessions) {
             [[NIMSDK sharedSDK].conversationManager deleteRecentSession:session];
         }
         
-    }else if ([@"messagesInSession" isEqualToString:call.method]) { //获取会话所有消息
+    }else if ([@"messagesInSession" isEqualToString:call.method]) {
+        // MARK: - //获取会话所有消息
         
         NSDictionary *args = call.arguments;
         NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
@@ -402,7 +420,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
         result([[NimDataManager shared] dictionaryToJson:@{@"messages": messageDics}]);
         
-    }else if ([@"allUnreadCount" isEqualToString:call.method]) { //获取所有未读
+    }else if ([@"allUnreadCount" isEqualToString:call.method]) {
+        // MARK: - //获取所有未读
         
         NSInteger count = [[NIMSDK sharedSDK].conversationManager allUnreadCount];
         result([NSString stringWithFormat:@"%ld",(long)count]);
