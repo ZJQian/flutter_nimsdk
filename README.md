@@ -115,4 +115,51 @@ NIMDelegateTypeOnLogin表示的是登陆状态回调：
 根据delegateType来区分各种回调。
 
 
+### 视频窗口
+通过`UIKitView`组件,根据`viewType`区分原生`view`.
 
+例如:
+
+```dart
+
+// LocalDisplayView是当前用户视频窗口. 即对主叫来说,代表的是主叫视频窗口; 对被叫来说,代表的是被叫视频窗口
+// RemoteDisplayView表示的就是对方视频窗口. 对主叫来说,被叫是对方;对被叫来说,主叫是对方.
+	 Stack(
+        children: <Widget>[
+          Container(
+            width: window.physicalSize.width,
+            height: window.physicalSize.height,
+            child: UiKitView(
+              viewType: "LocalDisplayView",
+            ),
+          ),
+          Container(
+            width: 100,
+            height: 150,
+            child: UiKitView(
+              viewType: "RemoteDisplayView",
+            ),
+          ),
+        ],
+      ),
+
+```
+
+**注意: 只有当接受视频请求后并且本次通话成功建立后, 才可以进行向视频页面跳转的操作**
+
+例如: 
+
+```dart
+
+///被叫响应通话请求
+  void response(BuildContext context,bool accept) {
+    NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
+    FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
+        
+        if (accept && isConnectSuccess) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage()));
+        }
+    });
+  }
+
+```
