@@ -115,7 +115,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 
                 //链接成功
                 if (!error) {
-                    
                     result(nil);
                 }else{//链接失败
                     
@@ -848,7 +847,11 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnCallEstablished],
                               @"callID": [NSString stringWithFormat:@"%llu",callID]};
-        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+
+        });
     }
 }
 

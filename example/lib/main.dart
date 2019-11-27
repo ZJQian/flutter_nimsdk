@@ -25,6 +25,9 @@ class _MyAppState extends State<MyApp> {
         body: HomeWidget()
       ),
     );
+    // return MaterialApp(
+    //   home: HomeWidget(),
+    // );
   }
 }
 
@@ -38,17 +41,20 @@ class _HomeWidgetState extends State<HomeWidget>{
    StreamSubscription _streamSubscription;
   ScrollController controller = ScrollController();
 
-  //  28   f51d1656315ac021d623f556dd493985
-  //  27   ae93a01e9a3f087e1e85a7de731955dc
-  int zhujiaoID = 27;
-  String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
+  //  28       f51d1656315ac021d623f556dd493985
+  //  27       ae93a01e9a3f087e1e85a7de731955dc
+  //  184600   971ddcaa4573470245d36eecc9d78201
+  
+  int zhujiaoID = 184600;
+  String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
   int beijiaoID = 28;
 
   // int zhujiaoID = 28;
   // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 27;
+  // int beijiaoID = 184600;
   
   String callID = "";
+  bool isConnectSuccess = false;
 
 
   @override
@@ -87,6 +93,7 @@ class _HomeWidgetState extends State<HomeWidget>{
     //  */
     Map<String,dynamic> result = json.decode(value);
     int delegateType = result["delegateType"];
+    bool accepted = false;
     print(value);
 
     if (delegateType == 1) {
@@ -94,6 +101,16 @@ class _HomeWidgetState extends State<HomeWidget>{
       callID = result["callID"];
     } else if (delegateType == 2) {
       
+      accepted = result["accepted"];
+    } else if (delegateType == 3) {
+
+        setState(() {
+          isConnectSuccess = true;
+        });
+        Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage())).then((res) {
+
+          this.hangup();
+        });
     }
 
 
@@ -144,7 +161,9 @@ class _HomeWidgetState extends State<HomeWidget>{
     NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
     FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
         
-        Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage()));
+        if (accept && isConnectSuccess) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage()));
+        }
     });
   }
 
