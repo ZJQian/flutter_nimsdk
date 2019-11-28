@@ -6,6 +6,7 @@
 //
 
 #import "DisplayView.h"
+#import "NimDataManager.h"
 
 @implementation DisplayView{
     int64_t _viewId;
@@ -15,14 +16,8 @@
 
 - (instancetype)initWithWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId arguments:(id)args binaryMessenger:(NSObject<FlutterBinaryMessenger> *)messenger view:(nonnull UIView *)displayView{
     if ([super init]) {
-        
-        NSDictionary *dic = args;
-        
+                
         _displayView = displayView;
-        
-//        _displayView = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x, frame.origin.y, 100, 100)];
-//        _displayView.backgroundColor = [UIColor orangeColor];
-        
         _viewId = viewId;
         NSString* channelName = [NSString stringWithFormat:@"plugins/display_%lld", viewId];
         _channel = [FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:messenger];

@@ -81,8 +81,8 @@ class FlutterNimsdk {
   }
 
   /// 主叫发起通话请求
-  Future<String> start(String callees,NIMNetCallMediaType type,NIMNetCallOption option) async {
-    return await _channel.invokeMethod("start",{"callees":callees, "type": type.index, "options": option.toJson()});
+  Future<String> start(String callees,NIMNetCallMediaType type,NIMNetCallOption option, String timeStamp) async {
+    return await _channel.invokeMethod("start",{"callees":callees, "type": type.index, "options": option.toJson(), "timeStamp": timeStamp});
   }
 
   /// 挂断

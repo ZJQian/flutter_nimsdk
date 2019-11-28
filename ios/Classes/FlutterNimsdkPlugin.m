@@ -43,10 +43,12 @@ typedef enum : NSUInteger {
 
 
 
-@property(nonatomic, strong) UIView *localDisplayView;
-@property(nonatomic, strong) UIView *remoteDisplayView;
 
 @property(nonatomic, assign) NIMNetCallMediaType mediaType;
+
+@property (nonatomic, copy) NSString *currentTimeStamp;
+
+
 
 
 
@@ -77,7 +79,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     [[[NIMSDK sharedSDK] mediaManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] chatManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:instance];
-    [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:instance];
 
 
     [instance initChannel:registrar];
@@ -115,6 +116,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 
                 //链接成功
                 if (!error) {
+                    
                     result(nil);
                 }else{//链接失败
                     
@@ -192,7 +194,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         
         result(nil);
-    }else if([@"login" isEqualToString: call.method]){// 登陆
+    }else if([@"login" isEqualToString: call.method]){
+        // MARK: - 登陆
         
         NSDictionary *args = call.arguments;
         NSString *account = args[@"account"];
@@ -211,7 +214,9 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         }];
 
         
-    }else if([@"autoLogin" isEqualToString: call.method]){ // 自动登陆
+    }else if([@"autoLogin" isEqualToString: call.method]){
+        
+        // MARK: -  自动登陆
         
         
         NSDictionary *args = call.arguments;
@@ -225,64 +230,75 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
 
         
-    }else if ([@"logout" isEqualToString: call.method]) { //登出
+    }else if ([@"logout" isEqualToString: call.method]) {
+        
+        // MARK: - 登出
         
         [[[NIMSDK sharedSDK] loginManager] logout:^(NSError *error) {
-            //jump to login page
+            
+            [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
         }];
         
     } else if([@"start" isEqualToString: call.method]){
         // MARK: - 发起通话
         
         NSDictionary *args = call.arguments;
-        NSString *callees = args[@"callees"];
-        int type = [NSString stringWithFormat:@"%@",args[@"type"]].intValue;
-        NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
-        option.extendMessage = args[@"options"][@"extendMessage"];
-        option.apnsContent = args[@"options"][@"apnsContent"];
-        option.apnsSound = args[@"options"][@"apnsSound"] == nil ? @"video_chat_tip_receiver.aac" : args[@"options"][@"apnsSound"];
-        
-        //指定 option 中的 videoCaptureParam 参数
-        NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
-        //清晰度480P
-        param.preferredVideoQuality = NIMNetCallVideoQuality480pLevel;
-        //裁剪类型 16:9
-        param.videoCrop  = NIMNetCallVideoCrop16x9;
-        //打开初始为前置摄像头
-        param.startWithBackCamera = NO;
-        
-        //若需要开启前处理指定 videoProcessorParam
-        NIMNetCallVideoProcessorParam *videoProcessorParam = [[NIMNetCallVideoProcessorParam alloc] init];
-        //若需要通话开始时就带有前处理效果（如美颜自然模式）
-        videoProcessorParam.filterType = NIMNetCallFilterTypeZiran;
-        param.videoProcessorParam = videoProcessorParam;
-        
-        
-        option.videoCaptureParam = param;
-        option.videoCaptureParam.videoHandler = ^(CMSampleBufferRef  _Nonnull sampleBuffer) {
-            [self processVideoCallWithBuffer:sampleBuffer];
-        };
-
-        self.mediaType = type+1;
-
-        //开始通话
-        [[NIMAVChatSDK sharedSDK].netCallManager start:@[callees] type:(type+1) option:option completion:^(NSError *error, UInt64 callID) {
+        self.currentTimeStamp = args[@"timeStamp"];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             
+            NSString *callees = args[@"callees"];
+            
+            int type = [NSString stringWithFormat:@"%@",args[@"type"]].intValue;
+            NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
+            option.extendMessage = args[@"options"][@"extendMessage"];
+            option.apnsContent = args[@"options"][@"apnsContent"];
+            option.apnsSound = args[@"options"][@"apnsSound"] == nil ? @"video_chat_tip_receiver.aac" : args[@"options"][@"apnsSound"];
+            
+            //指定 option 中的 videoCaptureParam 参数
+            NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
+            //清晰度480P
+            param.preferredVideoQuality = NIMNetCallVideoQuality480pLevel;
+            //裁剪类型 16:9
+            param.videoCrop  = NIMNetCallVideoCrop16x9;
+            //打开初始为前置摄像头
+            param.startWithBackCamera = NO;
+            
+            //若需要开启前处理指定 videoProcessorParam
+            NIMNetCallVideoProcessorParam *videoProcessorParam = [[NIMNetCallVideoProcessorParam alloc] init];
+            //若需要通话开始时就带有前处理效果（如美颜自然模式）
+            videoProcessorParam.filterType = NIMNetCallFilterTypeZiran;
+            param.videoProcessorParam = videoProcessorParam;
+            
+            
+            option.videoCaptureParam = param;
+            option.videoCaptureParam.videoHandler = ^(CMSampleBufferRef  _Nonnull sampleBuffer) {
+                [self processVideoCallWithBuffer:sampleBuffer];
+            };
 
-            if (!error) {
-                    //通话发起成功
+            self.mediaType = type+1;
+
+            //开始通话
+            [[NIMAVChatSDK sharedSDK].netCallManager start:@[callees] type:(type+1) option:option completion:^(NSError *error, UInt64 callID) {
                 
 
-                NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起成功"};
-                result([[NimDataManager shared] dictionaryToJson:dic]);
-                
-            }else{
-                    //通话发起失败
-                NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"通话发起失败" : error.userInfo[@"NSLocalizedDescription"];
-                NSDictionary *dic = @{@"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code],@"callID": [NSString stringWithFormat:@"%llu",callID]};
-                result([[NimDataManager shared] dictionaryToJson:dic]);
-            }
-        }];
+                if (!error) {
+                        //通话发起成功
+                    
+
+                    NSDictionary *dic = @{@"callID": [NSString stringWithFormat:@"%llu",callID],@"msg": @"通话发起成功"};
+                    result([[NimDataManager shared] dictionaryToJson:dic]);
+                    
+                }else{
+                        //通话发起失败
+                    NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"通话发起失败" : error.userInfo[@"NSLocalizedDescription"];
+                    NSDictionary *dic = @{@"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code],@"callID": [NSString stringWithFormat:@"%llu",callID]};
+                    result([[NimDataManager shared] dictionaryToJson:dic]);
+                }
+            }];
+            
+        });
+        
+        
         
     } else if ([@"hangup" isEqualToString:call.method]) {
         // MARK: - 挂断
@@ -291,11 +307,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSString *callID_str = args[@"callID"];
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
+        [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
         [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            
-            [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
-        });
         
     }else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
         
@@ -793,6 +806,11 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)onLogin:(NIMLoginStep)step {
     
     if (self.eventSink) {
+        
+        if (step == 8) {
+            [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:self];
+        }
+        
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInteger:NIMDelegateTypeOnLogin],
                               @"step": [NSNumber numberWithInteger:step]};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
@@ -814,10 +832,15 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 // MARK: - NIMNetCallManagerDelegate
 //被叫收到呼叫
 - (void)onReceive:(UInt64)callID from:(NSString *)caller type:(NIMNetCallMediaType)type message:(NSString *)extendMessage {
+    
+    NSDictionary *tempDic = [[NimDataManager shared] dictionaryWithJsonString:extendMessage];
+    self.currentTimeStamp = tempDic[@"currentTimeStamp"];
     if (self.eventSink) {
+        
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnReceive],
                               @"callID": [NSString stringWithFormat:@"%llu",callID],
                               @"caller": caller,
+                              @"currentTimeStamp": tempDic[@"currentTimeStamp"],
                               @"type": [NSNumber numberWithInteger:type],
                               @"extendMessage": extendMessage == nil ? @"" : extendMessage};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
@@ -889,17 +912,18 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)onLocalDisplayviewReady:(UIView *)displayView {
     
     NSLog(@"onLocalDisplayviewReady == %@",displayView);
-    self.localDisplayView = displayView;
-    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:@"LocalDisplayView"];
+    
+    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"LocalDisplayView-%@",self.currentTimeStamp]];
+    
 
 }
 
 - (void)onRemoteDisplayviewReady:(UIView *)displayView user:(NSString *)user {
     
     NSLog(@"onRemoteDisplayviewReady == %@, user == %@",displayView,user);
-    self.remoteDisplayView = displayView;
     
-    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:@"RemoteDisplayView"];
+    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"RemoteDisplayView-%@",self.currentTimeStamp]];
+    
 
 }
 

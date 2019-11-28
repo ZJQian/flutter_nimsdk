@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_nimsdk/flutter_nimsdk.dart';
 import 'dart:convert';
-import 'package:flutter_alert/flutter_alert.dart';
 import 'video.dart';
+import 'dart:ui';
 
 void main() => runApp(MyApp());
 
@@ -19,9 +19,9 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
+        // appBar: AppBar(
+        //   title: const Text('Plugin example app'),
+        // ),
         body: HomeWidget()
       ),
     );
@@ -55,7 +55,9 @@ class _HomeWidgetState extends State<HomeWidget>{
   
   String callID = "";
   bool isConnectSuccess = false;
-
+  bool showCallPage = false;
+  String currentTimeStamp = "";
+  String beijiaoTimeStamp = "";
 
   @override
   void initState() {
@@ -98,26 +100,51 @@ class _HomeWidgetState extends State<HomeWidget>{
 
     if (delegateType == 1) {
 
-      callID = result["callID"];
+      setState(() {
+        callID = result["callID"];
+        showCallPage = true;
+        beijiaoTimeStamp = result["currentTimeStamp"];
+
+      });
+      
+
+
+      print("******************************************");
+      print("beijiaoTimeStamp是:   "+beijiaoTimeStamp);
+      print("******************************************");
     } else if (delegateType == 2) {
       
       accepted = result["accepted"];
+      
+      
     } else if (delegateType == 3) {
 
         setState(() {
           isConnectSuccess = true;
         });
-        Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage())).then((res) {
 
-          this.hangup();
+        String time = (currentTimeStamp == null || currentTimeStamp.length == 0) ? beijiaoTimeStamp : currentTimeStamp;
+        var route = MaterialPageRoute(builder: (context) => VideoPage(timeStamp: time));
+        Navigator.push(context, route).then((res) {
+
+            this.hangup();
         });
+
+        
+    }else if (delegateType == 4) {
+
+        Navigator.of(context).pop();
+        this.hangup();
     }
-
-
   }
+
   // 错误处理
   void _onError(dynamic) {
     print("on error");
+  }
+
+  static String currentTimeMillis() {
+    return new DateTime.now().millisecondsSinceEpoch.toString();
   }
 
 // 注册
@@ -149,10 +176,17 @@ class _HomeWidgetState extends State<HomeWidget>{
 
   /// 主叫发起通话请求
   void start() {
-    NIMNetCallOption callOption = NIMNetCallOption(extendMessage: "extendMessage",apnsContent: "apnsContent",apnsSound: "apnsSound");
-    FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Video, callOption).then((result) {
+
+    String time = currentTimeMillis();
+    String extendMessage = '{"currentTimeStamp":"${time}"}';
+    NIMNetCallOption callOption = NIMNetCallOption(extendMessage: extendMessage,apnsContent: "apnsContent",apnsSound: "apnsSound");
+
+    FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Video, callOption,time).then((result) {
         print(result);
-        callID = jsonDecode(result)["callID"].toString();
+        setState(() {
+          callID = jsonDecode(result)["callID"].toString();
+          currentTimeStamp = time;
+        });
     });
   }
 
@@ -161,9 +195,17 @@ class _HomeWidgetState extends State<HomeWidget>{
     NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
     FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
         
-        if (accept && isConnectSuccess) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage()));
-        }
+        setState(() {
+          showCallPage = false;
+        });
+        print("this.beijiaoTimeStamp 是:    "+this.beijiaoTimeStamp);
+        // if (accept && isConnectSuccess) {
+          
+        //   var route = MaterialPageRoute(builder: (context) => VideoPage(timeStamp: currentTimeStamp));
+        //   Navigator.push(context, route).then((res) {
+
+        //   });
+        // }
     });
   }
 
@@ -225,148 +267,197 @@ class _HomeWidgetState extends State<HomeWidget>{
     FlutterNimsdk().markAllMessagesRead();
   }
 
+  Widget handleCall(BuildContext context) {
+
+    if (showCallPage) {
+      return Opacity(
+        opacity: 1,
+        child: Container(
+          width: window.physicalSize.width,
+          height: window.physicalSize.height,
+          color: Colors.black,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Container(
+                  width: 100,
+                  height: 100,
+                  child: RaisedButton(
+                    color: Colors.blue,
+                    onPressed: (){
+                      this.response(context, true);
+                    },
+                    child: Text("接听"),
+                  ),
+                ),
+                Container(
+                  width: 100,
+                  height: 100,
+                  child: RaisedButton(
+                    color: Colors.red,
+                    onPressed: (){
+                      this.response(context, false);
+                    },
+                    child: Text("挂断"),
+                  ),
+                )
+              ],
+            ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Flutter Text"),
+        title: new Text("Flutter Plugin"),
       ),
-      body: new SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              controller: controller,
-              child: Column(
-                children: <Widget>[
-                  Text(zhujiaoID.toString()),
-                  RaisedButton(
-                    onPressed: (){
-                      this.login();
+      body: Stack(
+        children: <Widget>[
+          new SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                controller: controller,
+                child: Column(
+                  children: <Widget>[
+                    Text(zhujiaoID.toString()),
+                    RaisedButton(
+                      onPressed: (){
+                        this.login();
+                        },
+                      child: Text("登陆"),
+                    ),
+                    RaisedButton(
+                      onPressed: () {
+                        this.autoLogin();
                       },
-                    child: Text("登陆"),
-                  ),
-                  RaisedButton(
-                    onPressed: () {
-                      this.autoLogin();
-                    },
-                    child: Text("自动登陆"),
-                  ),
-                  RaisedButton(
-                    onPressed: () {
-                      this.logout();
-                    },
-                    child: Text("登出"),
-                  ),
-                  Container(
-                    color: Colors.orange,
-                    child: Column(
-                      children: <Widget>[
-                        Text("主叫"),
-                        Row(
-                          children: <Widget>[
-                            RaisedButton(
-                              onPressed: () {
-                                this.start();
-                              },
-                              child: Text("发起通话"),
-                            ),
-                            RaisedButton(
-                              onPressed: (){
-                                this.hangup();
-                              },
-                              child: Text("挂断"),
-                            ),
-                          ],
-                        ),
-                      ],
+                      child: Text("自动登陆"),
                     ),
-                  ),
-                  
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    color: Colors.red,
-                    child: Column(
-                      children: <Widget>[
-                        Text("被叫"),
-                        Row(
-                          children: <Widget>[
-                            RaisedButton(
-                              onPressed: () {
-                                this.response(context,true);
-                              },
-                              child: Text("接听"),
-                            ),
-                            RaisedButton(
-                              onPressed: (){
-                                this.response(context,false);
-                              },
-                              child: Text("拒绝接听"),
-                            ),
-                          ],
-                        ),
-                      ],
+                    RaisedButton(
+                      onPressed: () {
+                        this.logout();
+                      },
+                      child: Text("登出"),
                     ),
-                  ),
-                  
-                  RaisedButton(
-                    onPressed: (){
-                      this.records();
-                    },
-                    child: Text("获取话单"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.deleteRecords();
-                    },
-                    child: Text("清空话单"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.setCameraDisable();
-                    },
-                    child: Text("动态设置摄像头"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.switchCamera();
-                    },
-                    child: Text("动态切换摄像头"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.setMute();
-                    },
-                    child: Text("设置静音"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.getRecentList();
-                    },
-                    child: Text("获取最近消息列表"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.sendText();
-                    },
-                    child: Text("发送文本消息"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.sendMessageReceipt();
-                    },
-                    child: Text("发送消息回执"),
-                  ),
-                  RaisedButton(
-                    onPressed: (){
-                      this.markAllMessagesRead();
-                    },
-                    child: Text("设置全部已读"),
-                  )
-                ],
+                    Container(
+                      color: Colors.orange,
+                      child: Column(
+                        children: <Widget>[
+                          Text("主叫"),
+                          Row(
+                            children: <Widget>[
+                              RaisedButton(
+                                onPressed: () {
+                                  this.start();
+                                },
+                                child: Text("发起通话"),
+                              ),
+                              RaisedButton(
+                                onPressed: (){
+                                  this.hangup();
+                                },
+                                child: Text("挂断"),
+                              ),
+                            ],
+                          ),
+                          Text("${this.currentTimeStamp}")
+                        ],
+                      ),
+                    ),
+                    
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      color: Colors.red,
+                      child: Column(
+                        children: <Widget>[
+                          Text("被叫"),
+                          Row(
+                            children: <Widget>[
+                              RaisedButton(
+                                onPressed: () {
+                                  this.response(context,true);
+                                },
+                                child: Text("接听"),
+                              ),
+                              RaisedButton(
+                                onPressed: (){
+                                  this.response(context,false);
+                                },
+                                child: Text("拒绝接听"),
+                              ),
+                            ],
+                          ),
+                          Text("${this.beijiaoTimeStamp}")
+                        ],
+                      ),
+                    ),
+                    
+                    RaisedButton(
+                      onPressed: (){
+                        this.records();
+                      },
+                      child: Text("获取话单"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.deleteRecords();
+                      },
+                      child: Text("清空话单"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.setCameraDisable();
+                      },
+                      child: Text("动态设置摄像头"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.switchCamera();
+                      },
+                      child: Text("动态切换摄像头"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.setMute();
+                      },
+                      child: Text("设置静音"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.getRecentList();
+                      },
+                      child: Text("获取最近消息列表"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.sendText();
+                      },
+                      child: Text("发送文本消息"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.sendMessageReceipt();
+                      },
+                      child: Text("发送消息回执"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.markAllMessagesRead();
+                      },
+                      child: Text("设置全部已读"),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+          handleCall(context)
+        ],
+      )
     );
   }
 }

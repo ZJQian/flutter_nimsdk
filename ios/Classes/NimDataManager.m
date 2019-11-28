@@ -72,5 +72,12 @@
     return dic;
 }
 
+- (NSString *)getCurrentTimeStamp {
+    
+    NSDate *date = [NSDate date];
+    NSString *timeSp = [NSString stringWithFormat:@"%ld", (long)([date timeIntervalSince1970]*1000)];
+    return timeSp;
+}
+
 
 @end

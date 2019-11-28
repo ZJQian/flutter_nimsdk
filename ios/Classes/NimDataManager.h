@@ -40,6 +40,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString;
 
+
+
+/// 获取当前时间戳
+- (NSString *)getCurrentTimeStamp;
+
 @end
 
 NS_ASSUME_NONNULL_END
