@@ -90,8 +90,8 @@ FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Video, callOptio
   
 
 ```
-**注意: 扩展消息`extendMessage`这里加上了一个当前时间的时间戳, 是为了避免挂断视频通话后再次发起通话出现的闪退问题. **
-
+**注意: 扩展消息`extendMessage`这里加上了一个当前时间的时间戳, 是为了避免挂断视频通话后再次发起通话出现的闪退问题.**
+ 
 ### 回调
 
 ```dart
@@ -143,7 +143,7 @@ NIMDelegateTypeOnLogin表示的是登陆状态回调：
 
 // LocalDisplayView是当前用户视频窗口. 即对主叫来说,代表的是主叫视频窗口; 对被叫来说,代表的是被叫视频窗口
 // RemoteDisplayView表示的就是对方视频窗口. 对主叫来说,被叫是对方;对被叫来说,主叫是对方.
-	Stack(
+Stack(
         children: <Widget>[
           Container(
             width: window.physicalSize.width,
