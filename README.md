@@ -73,6 +73,25 @@ FlutterNimsdk().login(loginInfo).then((result) {
 await FlutterNimsdk().logout();
 ```
 
+### 发起通话
+
+```dart
+
+String time = currentTimeMillis();
+String extendMessage = '{"currentTimeStamp":"${time}"}';
+NIMNetCallOption callOption = NIMNetCallOption(extendMessage: extendMessage,apnsContent: "apnsContent",apnsSound: "apnsSound");
+
+FlutterNimsdk().start(beijiaoID.toString(), NIMNetCallMediaType.Video, callOption,time).then((result) {
+        
+      print(result);
+        
+  });
+}
+  
+
+```
+**注意: 扩展消息`extendMessage`这里加上了一个当前时间的时间戳, 是为了避免挂断视频通话后再次发起通话出现的闪退问题. **
+
 ### 回调
 
 ```dart
@@ -124,20 +143,20 @@ NIMDelegateTypeOnLogin表示的是登陆状态回调：
 
 // LocalDisplayView是当前用户视频窗口. 即对主叫来说,代表的是主叫视频窗口; 对被叫来说,代表的是被叫视频窗口
 // RemoteDisplayView表示的就是对方视频窗口. 对主叫来说,被叫是对方;对被叫来说,主叫是对方.
-	 Stack(
+	Stack(
         children: <Widget>[
           Container(
             width: window.physicalSize.width,
             height: window.physicalSize.height,
             child: UiKitView(
-              viewType: "LocalDisplayView",
+              viewType: "LocalDisplayView-${widget.timeStamp}",
             ),
           ),
           Container(
             width: 100,
             height: 150,
             child: UiKitView(
-              viewType: "RemoteDisplayView",
+              viewType: "RemoteDisplayView-${widget.timeStamp}",
             ),
           ),
         ],
@@ -147,19 +166,3 @@ NIMDelegateTypeOnLogin表示的是登陆状态回调：
 
 **注意: 只有当接受视频请求后并且本次通话成功建立后, 才可以进行向视频页面跳转的操作**
 
-例如: 
-
-```dart
-
-///被叫响应通话请求
-  void response(BuildContext context,bool accept) {
-    NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
-    FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
-        
-        if (accept && isConnectSuccess) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPage()));
-        }
-    });
-  }
-
-```

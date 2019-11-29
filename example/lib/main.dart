@@ -19,15 +19,9 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       home: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Plugin example app'),
-        // ),
         body: HomeWidget()
       ),
     );
-    // return MaterialApp(
-    //   home: HomeWidget(),
-    // );
   }
 }
 
@@ -45,13 +39,13 @@ class _HomeWidgetState extends State<HomeWidget>{
   //  27       ae93a01e9a3f087e1e85a7de731955dc
   //  184600   971ddcaa4573470245d36eecc9d78201
   
-  int zhujiaoID = 184600;
-  String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
-  int beijiaoID = 28;
+  // int zhujiaoID = 184600;
+  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
+  // int beijiaoID = 28;
 
-  // int zhujiaoID = 28;
-  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 184600;
+  int zhujiaoID = 28;
+  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  int beijiaoID = 184600;
   
   String callID = "";
   bool isConnectSuccess = false;
@@ -107,11 +101,10 @@ class _HomeWidgetState extends State<HomeWidget>{
 
       });
       
-
-
       print("******************************************");
       print("beijiaoTimeStamp是:   "+beijiaoTimeStamp);
       print("******************************************");
+
     } else if (delegateType == 2) {
       
       accepted = result["accepted"];
@@ -199,13 +192,6 @@ class _HomeWidgetState extends State<HomeWidget>{
           showCallPage = false;
         });
         print("this.beijiaoTimeStamp 是:    "+this.beijiaoTimeStamp);
-        // if (accept && isConnectSuccess) {
-          
-        //   var route = MaterialPageRoute(builder: (context) => VideoPage(timeStamp: currentTimeStamp));
-        //   Navigator.push(context, route).then((res) {
-
-        //   });
-        // }
     });
   }
 

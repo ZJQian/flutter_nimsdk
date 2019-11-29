@@ -6,7 +6,6 @@ import 'src/config.dart';
 export 'src/config.dart';
 import 'src/enum.dart';
 export 'src/enum.dart';
-import 'src/nim_session_model.dart';
 export 'src/nim_session_model.dart';
 import 'src/nim_message_model.dart';
 export 'src/nim_message_model.dart';
@@ -19,7 +18,8 @@ class FlutterNimsdk {
 
   // EventChannel eventChannel = EventChannel("flutter_nimsdk/Event/Channel", const StandardMethodCodec());
     // 初始化一个广播流从channel中接收数据，返回的Stream调用listen方法完成注册，需要在页面销毁时调用Stream的cancel方法取消监听
-    StreamSubscription _streamSubscription;
+    
+    // StreamSubscription _streamSubscription;
     //创建 “ MethodChannel”这个名字要与原生创建时的传入值保持一致
     static const MethodChannel _methodChannelPlugin = const MethodChannel('flutter_nimsdk/Method/Channel');
   
@@ -46,9 +46,9 @@ class FlutterNimsdk {
     return _methodChannelPlugin;
   }
 
-  StreamSubscription streamSubscription() {
-    return _streamSubscription;
-  }
+  // StreamSubscription streamSubscription() {
+  //   return _streamSubscription;
+  // }
 
   EventChannel eventChannel() {
     return _eventChannel;
