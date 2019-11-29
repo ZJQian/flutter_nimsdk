@@ -79,6 +79,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     [[[NIMSDK sharedSDK] mediaManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] chatManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:instance];
+    [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:instance];
 
 
     [instance initChannel:registrar];
@@ -236,7 +237,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         [[[NIMSDK sharedSDK] loginManager] logout:^(NSError *error) {
             
-            [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
+//            [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
         }];
         
     } else if([@"start" isEqualToString: call.method]){
@@ -308,7 +309,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
         [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
-        [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
+//        [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
         
     }else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
         
@@ -807,9 +808,9 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     if (self.eventSink) {
         
-        if (step == 8) {
-            [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:self];
-        }
+//        if (step == 8) {
+//            [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:self];
+//        }
         
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInteger:NIMDelegateTypeOnLogin],
                               @"step": [NSNumber numberWithInteger:step]};
@@ -860,6 +861,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     }
     
 }
+
 
 //通话建立成功回调
 - (void)onCallEstablished:(UInt64)callID {
@@ -1071,5 +1073,14 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     }
     return _sessions;
 }
+
+- (void)dealloc {
+    
+    [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
+    [[[NIMSDK sharedSDK] loginManager] removeDelegate:self];
+    [[[NIMSDK sharedSDK] mediaManager] removeDelegate:self];
+    [[[NIMSDK sharedSDK] chatManager] removeDelegate:self];
+}
+
 
 @end

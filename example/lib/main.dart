@@ -126,8 +126,11 @@ class _HomeWidgetState extends State<HomeWidget>{
         
     }else if (delegateType == 4) {
 
-        Navigator.of(context).pop();
-        this.hangup();
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+          this.hangup();
+        }
+        
     }
   }
 
