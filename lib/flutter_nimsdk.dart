@@ -245,6 +245,16 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("deleteMessage",message.toJson());
   }
 
+  /// 获取会话所有消息
+  Future<String> messagesInSession(NIMSession session, List<String> messageIds) async {
+    return await _channel.invokeMethod("messagesInSession",{"session": session.toJson(),"messageIds": messageIds});
+  }
+
+  /// 从本地db读取一个会话里某条消息之前的若干条的消息
+  Future<String> messagesInSessionMessage(NIMSession session, NIMMessage message, int limit) async {
+    return await _channel.invokeMethod("messagesInSessionMessage",{"session": session.toJson(),"message": message.toJson(),"limit": limit.toString()});
+  }
+
   /// 删除某个会话的所有消息
   Future<void> deleteAllmessagesInSession(NIMSession session, NIMDeleteMessagesOption option) async {
     return await _channel.invokeMethod("deleteAllmessagesInSession",{"session": session.toJson(),"option": option.toJson()});

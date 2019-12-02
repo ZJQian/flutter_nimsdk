@@ -433,6 +433,17 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
         result([[NimDataManager shared] dictionaryToJson:@{@"messages": messageDics}]);
         
+    }else if ([@"messagesInSessionMessage" isEqualToString:call.method]) {
+        // MARK: - 从本地db读取一个会话里某条消息之前的若干条的消息
+        
+        NSDictionary *args = call.arguments;
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        NIMMessage *message = [NIMMessage mj_objectWithKeyValues:args[@"message"]];
+        NSInteger limit = [NSString stringWithFormat:@"%@",args[@"limit"]].integerValue;
+        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session message:message limit:limit];
+        NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
+        result([[NimDataManager shared] dictionaryToJson:@{@"messages": messageDics}]);
+        
     }else if ([@"allUnreadCount" isEqualToString:call.method]) {
         // MARK: - //获取所有未读
         
