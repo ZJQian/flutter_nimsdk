@@ -189,6 +189,7 @@ class _HomeWidgetState extends State<HomeWidget>{
   ///被叫响应通话请求
   void response(BuildContext context,bool accept) {
     NIMResponse nimResponse = NIMResponse(callID: callID,accept: accept);
+    
     FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {"response":nimResponse.toJson(),"mediaType": NIMNetCallMediaType.Video.index}).then((result) {
         
         setState(() {
@@ -254,6 +255,13 @@ class _HomeWidgetState extends State<HomeWidget>{
   /// 设置全部已读
   void markAllMessagesRead() async {
     FlutterNimsdk().markAllMessagesRead();
+  }
+
+  void fetchMessageHistory() async {
+
+    NIMSession session = NIMSession(sessionId: "",sessionType: 0);
+    NIMHistoryMessageSearchOption option = NIMHistoryMessageSearchOption(startTime: 0,limit: 0,endTime: 0);
+    FlutterNimsdk().fetchMessageHistory(session, option);
   }
 
   Widget handleCall(BuildContext context) {

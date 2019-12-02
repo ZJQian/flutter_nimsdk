@@ -915,18 +915,19 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     NSLog(@"onLocalDisplayviewReady == %@",displayView);
     
-    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"LocalDisplayView-%@",self.currentTimeStamp]];
-    
+    if (displayView.bounds.size.width == 0) {
+        [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"LocalDisplayView-%@",self.currentTimeStamp]];
 
+    }
 }
 
 - (void)onRemoteDisplayviewReady:(UIView *)displayView user:(NSString *)user {
     
     NSLog(@"onRemoteDisplayviewReady == %@, user == %@",displayView,user);
     
-    [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"RemoteDisplayView-%@",self.currentTimeStamp]];
-    
-
+    if (displayView.bounds.size.width == 0) {
+        [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"RemoteDisplayView-%@",self.currentTimeStamp]];
+    }
 }
 
 // MARK: - NIMConversationManagerDelegate
