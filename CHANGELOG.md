@@ -1,3 +1,6 @@
+## 1.4.1
+* add netCallControlType && callback
+
 ## 1.4.0
 * 新增会话历史记录接口
 
