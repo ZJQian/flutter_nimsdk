@@ -20,6 +20,7 @@ typedef enum : NSUInteger {
     NIMDelegateTypeDidRemoveRecentSession = 8,
     NIMDelegateTypeRecordAudioComplete = 9,
     NIMDelegateTypeOnRecvMessageReceipts = 10,
+    NIMDelegateTypeOnControl = 11,
 } NIMDelegateType;
 
 @interface FlutterNimsdkPlugin()<NIMLoginManagerDelegate,
@@ -545,7 +546,20 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 result([[NimDataManager shared] dictionaryToJson:dic]);
             }
         }];
+    }else if ([@"netCallControl" isEqualToString:call.method]) {
+        // MARK: - 发送网络通话的控制信息，用于方便通话双方沟通信息
         
+        NSDictionary *args = call.arguments;
+        UInt64 currentCallID = [[[NIMAVChatSDK sharedSDK] netCallManager] currentCallID];
+        NIMNetCallControlType type = [NSString stringWithFormat:@"%@",args[@"netCallControlType"]].integerValue;
+        [[[NIMAVChatSDK sharedSDK] netCallManager] control: currentCallID type:type];
+    
+    }else if ([@"currentCallID" isEqualToString:call.method]) {
+            
+        // MARK: - 获取正在进行中的网络通话call id
+        UInt64 currentCallID = [[[NIMAVChatSDK sharedSDK] netCallManager] currentCallID];
+        NSString *strCallID = [NSString stringWithFormat:@"%llu",currentCallID];
+        result(strCallID);
     }
     // else if ([@"initFaceunity" isEqualToString:call.method]) {// Faceunity初始化
         
@@ -938,6 +952,18 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     if (displayView.bounds.size.width == 0) {
         [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"RemoteDisplayView-%@",self.currentTimeStamp]];
+    }
+}
+
+- (void)onControl:(UInt64)callID from:(NSString *)user type:(NIMNetCallControlType)control {
+    
+    if (self.eventSink) {
+        
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnControl],
+                              @"callID": [NSString stringWithFormat:@"%llu",callID],
+                              @"formUser": user,
+                              @"controlType": [NSNumber numberWithInteger:control]};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
 }
 

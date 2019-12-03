@@ -78,6 +78,13 @@ class _VideoPageState extends State<VideoPage> {
                     FlutterNimsdk().switchCamera(NIMNetCallCamera.front);
                   },
                   child: Text("前摄"),
+                ),
+                RaisedButton(
+                  color: Colors.yellow,
+                  onPressed: () {
+                    FlutterNimsdk().setControlType(NIMNetCallControlType.closeVideo);
+                  },
+                  child: Text("网络控制"),
                 )
               ],
             ),

@@ -118,6 +118,18 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("switchCamera",{"camera": camera});
   }
 
+  /// 发送网络通话的控制信息，用于方便通话双方沟通信息
+  Future<void> setControlType(NIMNetCallControlType controlType) async {
+
+    int type = controlType.index+1;
+    return await _channel.invokeMethod("netCallControl",{"netCallControlType": type.toString()});
+  }
+
+  /// 获取正在进行中的网络通话call id
+  Future<String> currentCallID() async {
+    return await _channel.invokeMethod("currentCallID");
+  }
+
   /// 设置静音
   Future<void> setMute(bool mute) async {
 
@@ -130,15 +142,6 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("setSpeaker",{"speaker": useSpeaker});
   }
 
-  /// 设置视频通话对方的窗口的大小
-  Future<void> setRemoteViewLayout(double originX,double originY, double width, double height) async {
-    return await _channel.invokeMethod("setRemoteViewLayout",{"originX": originX,"originY":originY,"width":width,"height":height});
-  }
-
-  /// 视频页面模态消失
-  Future<void> dismissVideo() async {
-    return await _channel.invokeMethod("dismissVideo");
-  }
 
   /// IM 
   /// 最近会话列表
