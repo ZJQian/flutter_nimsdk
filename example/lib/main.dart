@@ -45,7 +45,7 @@ class _HomeWidgetState extends State<HomeWidget>{
 
   int zhujiaoID = 28;
   String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  int beijiaoID = 184600;
+  int beijiaoID = 27;
   
   String callID = "";
   bool isConnectSuccess = false;
@@ -259,9 +259,18 @@ class _HomeWidgetState extends State<HomeWidget>{
 
   void fetchMessageHistory() async {
 
-    NIMSession session = NIMSession(sessionId: "",sessionType: 0);
+    NIMSession session = NIMSession(sessionId: "27",sessionType: 0);
     NIMHistoryMessageSearchOption option = NIMHistoryMessageSearchOption(startTime: 0,limit: 0,endTime: 0);
     FlutterNimsdk().fetchMessageHistory(session, option);
+  }
+
+  void messagesInSessionMessage() async {
+    NIMSession session = NIMSession(sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
+    NIMMessage message = NIMMessage();
+    FlutterNimsdk().messagesInSessionMessage(session, message, 10).then((result) {
+
+      print(result);
+    });
   }
 
   Widget handleCall(BuildContext context) {
@@ -446,6 +455,12 @@ class _HomeWidgetState extends State<HomeWidget>{
                         this.markAllMessagesRead();
                       },
                       child: Text("设置全部已读"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.messagesInSessionMessage();
+                      },
+                      child: Text("获取消息记录"),
                     )
                   ],
                 ),

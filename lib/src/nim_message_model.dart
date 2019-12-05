@@ -21,7 +21,7 @@ class NIMMessage {
   /// 是否显示时间戳
   bool isShowTimeTag = false;
 
-  NIMMessageType messageType;
+  int messageType;
   NIMMessageObject messageObject;
   NIMMessageDeliveryState deliveryState;
 
@@ -59,34 +59,34 @@ class NIMMessage {
 
     switch (messageTypeRawValue) {
       case 0:
-        messageType = NIMMessageType.Text;
+        messageType = NIMMessageType.Text.index;
         break;
       case 1:
-        messageType = NIMMessageType.Image;
+        messageType = NIMMessageType.Image.index;
         break;
       case 2:
-        messageType = NIMMessageType.Audio;
+        messageType = NIMMessageType.Audio.index;
         break;
       case 3:
-        messageType = NIMMessageType.Video;
+        messageType = NIMMessageType.Video.index;
         break;
       case 4:
-        messageType = NIMMessageType.Location;
+        messageType = NIMMessageType.Location.index;
         break;
       case 5:
-        messageType = NIMMessageType.Notification;
+        messageType = NIMMessageType.Notification.index;
         break;
       case 6:
-        messageType = NIMMessageType.File;
+        messageType = NIMMessageType.File.index;
         break;
       case 10:
-        messageType = NIMMessageType.Tip;
+        messageType = NIMMessageType.Tip.index;
         break;
       case 11:
-        messageType = NIMMessageType.Robot;
+        messageType = NIMMessageType.Robot.index;
         break;
       case 100:
-        messageType = NIMMessageType.Custom;
+        messageType = NIMMessageType.Custom.index;
         break;
     }
 

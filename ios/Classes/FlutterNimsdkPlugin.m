@@ -136,6 +136,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     
+    NSLog(@"**************************************************************\n \n  call.method ===> %@  \n call.arguments ==> %@ \n \n**************************************************************\n",call.method,call.arguments);
+
     if ([@"initSDK" isEqualToString:call.method]) {// 初始化
         
         NSDictionary *dict = call.arguments;
@@ -238,7 +240,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         [[[NIMSDK sharedSDK] loginManager] logout:^(NSError *error) {
             
-//            [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
         }];
         
     } else if([@"start" isEqualToString: call.method]){
@@ -442,8 +443,16 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NIMMessage *message = [NIMMessage mj_objectWithKeyValues:args[@"message"]];
         NSInteger limit = [NSString stringWithFormat:@"%@",args[@"limit"]].integerValue;
         NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session message:message limit:limit];
-        NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
-        result([[NimDataManager shared] dictionaryToJson:@{@"messages": messageDics}]);
+        NSMutableArray *array = [NSMutableArray array];
+        for (NIMMessage *m in messages) {
+            NSString *obj = [NSString stringWithFormat:@"%@",m.messageObject];
+            m.messageObject = nil;
+            NSMutableDictionary *tempDic = m.mj_keyValues;
+            tempDic[@"messageObject"] = obj;
+            [array addObject:tempDic];
+        }
+//        NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
+        result([[NimDataManager shared] dictionaryToJson:@{@"messages": array}]);
         
     }else if ([@"allUnreadCount" isEqualToString:call.method]) {
         // MARK: - //获取所有未读
