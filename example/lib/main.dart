@@ -4,6 +4,7 @@ import 'package:flutter_nimsdk/flutter_nimsdk.dart';
 import 'dart:convert';
 import 'video.dart';
 import 'dart:ui';
+import 'package:image_picker/image_picker.dart';
 
 void main() => runApp(MyApp());
 
@@ -246,6 +247,13 @@ class _HomeWidgetState extends State<HomeWidget>{
     await FlutterNimsdk().sendMessageText("发送文本消息", nimSession);
   }
 
+  /// 发送image消息
+  void sendImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    NIMSession nimSession = NIMSession(sessionId: beijiaoID.toString(),sessionType: NIMSessionType.P2P.index);
+    FlutterNimsdk().sendMessageImage(image.path, nimSession);
+  }
+
   ///发送已读消息回执
   void sendMessageReceipt() async {
     NIMMessage message = NIMMessage(from: "",messageId: "");
@@ -443,6 +451,12 @@ class _HomeWidgetState extends State<HomeWidget>{
                         this.sendText();
                       },
                       child: Text("发送文本消息"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.sendImage();
+                      },
+                      child: Text("发送图片消息"),
                     ),
                     RaisedButton(
                       onPressed: (){

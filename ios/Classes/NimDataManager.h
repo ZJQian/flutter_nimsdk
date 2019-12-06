@@ -45,6 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// 获取当前时间戳
 - (NSString *)getCurrentTimeStamp;
 
+
+
+///  消息类转字典  并处理特殊字段
+/// @param message <#message description#>
+- (NSDictionary *)handleNIMMessage:(NIMMessage *)message;
+
 @end
 
 NS_ASSUME_NONNULL_END

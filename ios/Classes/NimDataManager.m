@@ -85,4 +85,87 @@
 }
 
 
+- (NSDictionary *)handleNIMMessage:(NIMMessage *)message {
+    
+    NSMutableDictionary *tempDic = [message mj_keyValuesWithIgnoredKeys:@[@"messageObject"]];
+    if (message.messageType == NIMMessageTypeText) {
+        
+    }else if (message.messageType == NIMMessageTypeImage) {
+        
+        NIMImageObject *imgObj = (NIMImageObject *)message.messageObject;
+        imgObj.message.messageObject = nil;
+        tempDic[@"messageObject"] = [imgObj mj_keyValuesWithIgnoredKeys:@[@"size"]];
+    
+    }else if (message.messageType == NIMMessageTypeNotification) {
+        
+        NIMNotificationObject *noti = (NIMNotificationObject *)message.messageObject;
+        NIMNetCallNotificationContent *content = (NIMNetCallNotificationContent *)noti.content;
+        
+        NSMutableDictionary *contentDic = content.mj_keyValues;
+        contentDic[@"messageObject"] = @"";
+        contentDic[@"notificationType"] = [NSNumber numberWithInteger:noti.notificationType];
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeAudio) {
+        
+        NIMAudioObject *audio = (NIMAudioObject *)message.messageObject;
+        audio.message.messageObject = nil;
+        NSMutableDictionary *contentDic = audio.mj_keyValues;
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeVideo) {
+        
+        NIMVideoObject *video = (NIMVideoObject *)message.messageObject;
+        video.message.messageObject = nil;
+        NSMutableDictionary *contentDic = [video mj_keyValuesWithIgnoredKeys:@[@"coverSize"]];
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeLocation) {
+        
+        NIMLocationObject *location = (NIMLocationObject *)message.messageObject;
+        location.message.messageObject = nil;
+        NSMutableDictionary *contentDic = location.mj_keyValues;
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeFile) {
+        
+        NIMFileObject *file = (NIMFileObject *)message.messageObject;
+        file.message.messageObject = nil;
+        NSMutableDictionary *contentDic = file.mj_keyValues;
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeTip) {
+        
+        NIMTipObject *tip = (NIMTipObject *)message.messageObject;
+        tip.message.messageObject = nil;
+        NSMutableDictionary *contentDic = tip.mj_keyValues;
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeRobot) {
+        
+        NIMRobotObject *robot = (NIMRobotObject *)message.messageObject;
+        robot.message.messageObject = nil;
+        NSMutableDictionary *contentDic = robot.mj_keyValues;
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }else if (message.messageType == NIMMessageTypeCustom) {
+        
+        NIMCustomObject *custom = (NIMCustomObject *)message.messageObject;
+        custom.message.messageObject = nil;
+        NSMutableDictionary *contentDic = custom.mj_keyValues;
+        
+        tempDic[@"messageObject"] = contentDic;
+        
+    }
+    
+    return tempDic;
+}
+
+
 @end

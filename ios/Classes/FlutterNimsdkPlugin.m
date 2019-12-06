@@ -456,89 +456,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSMutableArray *array = [NSMutableArray array];
         for (NIMMessage *m in messages) {
             
-            if (m.messageType == NIMMessageTypeNotification) {
-                NIMNotificationObject *noti = (NIMNotificationObject *)m.messageObject;
-                NIMNetCallNotificationContent *content = (NIMNetCallNotificationContent *)noti.content;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = content.mj_keyValues;
-                contentDic[@"messageObject"] = @"";
-                contentDic[@"notificationType"] = [NSNumber numberWithInteger:noti.notificationType];
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeText) {
-                
-                m.messageObject = nil;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeImage) {
-                
-                NIMImageObject *img = (NIMImageObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = img.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeAudio) {
-                
-                NIMAudioObject *audio = (NIMAudioObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = audio.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeVideo) {
-                
-                NIMVideoObject *video = (NIMVideoObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = video.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeLocation) {
-                
-                NIMLocationObject *location = (NIMLocationObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = location.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeFile) {
-                
-                NIMFileObject *file = (NIMFileObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = file.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeTip) {
-                
-                NIMTipObject *tip = (NIMTipObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = tip.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeRobot) {
-                
-                NIMRobotObject *robot = (NIMRobotObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = robot.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }else if (m.messageType == NIMMessageTypeCustom) {
-                
-                NIMCustomObject *custom = (NIMCustomObject *)m.messageObject;
-                m.messageObject = nil;
-                NSMutableDictionary *contentDic = custom.mj_keyValues;
-                NSMutableDictionary *tempDic = m.mj_keyValues;
-                tempDic[@"messageObject"] = contentDic;
-                [array addObject:tempDic];
-            }
-            
+            [array addObject:[[NimDataManager shared] handleNIMMessage:m]];
         }
-//        NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
         result([[NimDataManager shared] dictionaryToJson:@{@"messages": array}]);
         
     }else if ([@"allUnreadCount" isEqualToString:call.method]) {
@@ -1198,8 +1117,9 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)willSendMessage:(NIMMessage *)message {
     
     if (self.eventSink) {
+        
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeWillSendMessage],
-                              @"message": message.mj_keyValues};
+                              @"message": [[NimDataManager shared] handleNIMMessage:message]};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
 }
@@ -1216,7 +1136,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     if (self.eventSink) {
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeUploadAttachmentSuccess],
                               @"urlString": urlString,
-                              @"message": message.mj_keyValues};
+                              @"message": [[NimDataManager shared] handleNIMMessage:message]};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
 }
@@ -1233,7 +1153,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     if (self.eventSink) {
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageProcess],
                               @"progress": [NSNumber numberWithFloat:progress],
-                              @"message": message.mj_keyValues};
+                              @"message": [[NimDataManager shared] handleNIMMessage:message]};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
 }
@@ -1253,7 +1173,7 @@ didCompleteWithError:(nullable NSError *)error {
             
             NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageComplete],
                                   @"msg": @"消息发送完成",
-                                  @"message": message.mj_keyValues};
+                                  @"message": [[NimDataManager shared] handleNIMMessage:message]};
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
             
         }else {
@@ -1261,7 +1181,7 @@ didCompleteWithError:(nullable NSError *)error {
 
             NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageComplete],
                                   @"error": @{@"msg": msg,@"errCode": [NSNumber numberWithInteger:error.code]},
-                                  @"message": message.mj_keyValues};
+                                  @"message": [[NimDataManager shared] handleNIMMessage:message]};
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
         }
         
@@ -1278,9 +1198,13 @@ didCompleteWithError:(nullable NSError *)error {
 - (void)onRecvMessages:(NSArray<NIMMessage *> *)messages {
     
     if (self.eventSink) {
-        NSArray *dicArray = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
+        NSMutableArray *array = [NSMutableArray array];
+        for (NIMMessage *message in messages) {
+            NSDictionary *dic = [[NimDataManager shared] handleNIMMessage:message];
+            [array addObject:dic];
+        }
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnRecvMessages],
-                              @"message": dicArray};
+                              @"message": array};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
 }
@@ -1313,7 +1237,7 @@ didCompleteWithError:(nullable NSError *)error {
     if (self.eventSink) {
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeFetchMessageAttachmentProcess],
                               @"progress": [NSNumber numberWithFloat:progress],
-                              @"message": message.mj_keyValues};
+                              @"message": [[NimDataManager shared] handleNIMMessage:message]};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
     }
 }
@@ -1334,7 +1258,7 @@ didCompleteWithError:(nullable NSError *)error {
             
             NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeFetchMessageAttachmentComplete],
                                   @"msg": @"收取消息附件完成",
-                                  @"message": message.mj_keyValues};
+                                  @"message": [[NimDataManager shared] handleNIMMessage:message]};
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
             
         }else {
@@ -1342,7 +1266,7 @@ didCompleteWithError:(nullable NSError *)error {
 
             NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeFetchMessageAttachmentComplete],
                                   @"error": @{@"msg": msg,@"errCode": [NSNumber numberWithInteger:error.code]},
-                                  @"message": message.mj_keyValues};
+                                  @"message": [[NimDataManager shared] handleNIMMessage:message]};
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
         }
         
