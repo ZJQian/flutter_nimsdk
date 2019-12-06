@@ -21,6 +21,16 @@ typedef enum : NSUInteger {
     NIMDelegateTypeRecordAudioComplete = 9,
     NIMDelegateTypeOnRecvMessageReceipts = 10,
     NIMDelegateTypeOnControl = 11,
+    
+    NIMDelegateTypeWillSendMessage = 12,
+    NIMDelegateTypeUploadAttachmentSuccess = 13,
+    NIMDelegateTypeSendMessageProcess = 14,
+    NIMDelegateTypeSendMessageComplete = 15,
+    NIMDelegateTypeOnRecvMessages = 16,
+    NIMDelegateTypeOnRecvRevokeMessageNotification = 17,
+    NIMDelegateTypeFetchMessageAttachmentProcess = 18,
+    NIMDelegateTypeFetchMessageAttachmentComplete = 19,
+    
 } NIMDelegateType;
 
 @interface FlutterNimsdkPlugin()<NIMLoginManagerDelegate,
@@ -445,11 +455,88 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session message:message limit:limit];
         NSMutableArray *array = [NSMutableArray array];
         for (NIMMessage *m in messages) {
-            NSString *obj = [NSString stringWithFormat:@"%@",m.messageObject];
-            m.messageObject = nil;
-            NSMutableDictionary *tempDic = m.mj_keyValues;
-            tempDic[@"messageObject"] = obj;
-            [array addObject:tempDic];
+            
+            if (m.messageType == NIMMessageTypeNotification) {
+                NIMNotificationObject *noti = (NIMNotificationObject *)m.messageObject;
+                NIMNetCallNotificationContent *content = (NIMNetCallNotificationContent *)noti.content;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = content.mj_keyValues;
+                contentDic[@"messageObject"] = @"";
+                contentDic[@"notificationType"] = [NSNumber numberWithInteger:noti.notificationType];
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeText) {
+                
+                m.messageObject = nil;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeImage) {
+                
+                NIMImageObject *img = (NIMImageObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = img.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeAudio) {
+                
+                NIMAudioObject *audio = (NIMAudioObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = audio.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeVideo) {
+                
+                NIMVideoObject *video = (NIMVideoObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = video.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeLocation) {
+                
+                NIMLocationObject *location = (NIMLocationObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = location.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeFile) {
+                
+                NIMFileObject *file = (NIMFileObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = file.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeTip) {
+                
+                NIMTipObject *tip = (NIMTipObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = tip.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeRobot) {
+                
+                NIMRobotObject *robot = (NIMRobotObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = robot.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }else if (m.messageType == NIMMessageTypeCustom) {
+                
+                NIMCustomObject *custom = (NIMCustomObject *)m.messageObject;
+                m.messageObject = nil;
+                NSMutableDictionary *contentDic = custom.mj_keyValues;
+                NSMutableDictionary *tempDic = m.mj_keyValues;
+                tempDic[@"messageObject"] = contentDic;
+                [array addObject:tempDic];
+            }
+            
         }
 //        NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
         result([[NimDataManager shared] dictionaryToJson:@{@"messages": array}]);
@@ -1100,6 +1187,165 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnRecvMessageReceipts],
                               @"receipts": receiptsArray};
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+/**
+*  即将发送消息回调
+*  @discussion 因为发消息之前可能会有个准备过程,所以需要在收到这个回调时才将消息加入到 Datasource 中
+*  @param message 当前发送的消息
+*/
+- (void)willSendMessage:(NIMMessage *)message {
+    
+    if (self.eventSink) {
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeWillSendMessage],
+                              @"message": message.mj_keyValues};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+/**
+ *  上传资源文件成功的回调
+ *  @discussion 对于需要上传资源的消息(图片，视频，音频等)，SDK 将在上传资源成功后通过这个接口进行回调，上层可以在收到该回调后进行推送信息的重新配置 (APNS payload)
+ *  @param urlString 当前消息资源获得的 url 地址
+ *  @param message 当前发送的消息
+ */
+- (void)uploadAttachmentSuccess:(NSString *)urlString
+                     forMessage:(NIMMessage *)message {
+    
+    if (self.eventSink) {
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeUploadAttachmentSuccess],
+                              @"urlString": urlString,
+                              @"message": message.mj_keyValues};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+/**
+ *  发送消息进度回调
+ *
+ *  @param message  当前发送的消息
+ *  @param progress 进度
+ */
+- (void)sendMessage:(NIMMessage *)message
+           progress:(float)progress {
+    
+    if (self.eventSink) {
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageProcess],
+                              @"progress": [NSNumber numberWithFloat:progress],
+                              @"message": message.mj_keyValues};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+
+/**
+ *  发送消息完成回调
+ *
+ *  @param message 当前发送的消息
+ *  @param error   失败原因,如果发送成功则error为nil
+ */
+- (void)sendMessage:(NIMMessage *)message
+didCompleteWithError:(nullable NSError *)error {
+    
+    if (self.eventSink) {
+        if (error == nil) {
+            
+            NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageComplete],
+                                  @"msg": @"消息发送完成",
+                                  @"message": message.mj_keyValues};
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+            
+        }else {
+            NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"消息发送失败" : error.userInfo[@"NSLocalizedDescription"];
+
+            NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageComplete],
+                                  @"error": @{@"msg": msg,@"errCode": [NSNumber numberWithInteger:error.code]},
+                                  @"message": message.mj_keyValues};
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+        }
+        
+    }
+    
+}
+
+
+/**
+ *  收到消息回调
+ *
+ *  @param messages 消息列表,内部为NIMMessage
+ */
+- (void)onRecvMessages:(NSArray<NIMMessage *> *)messages {
+    
+    if (self.eventSink) {
+        NSArray *dicArray = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnRecvMessages],
+                              @"message": dicArray};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+/**
+ *  收到消息被撤回的通知
+ *
+ *  @param notification 被撤回的消息信息
+ *  @discusssion 云信在收到消息撤回后，会先从本地数据库中找到对应消息并进行删除，之后通知上层消息已删除
+ */
+- (void)onRecvRevokeMessageNotification:(NIMRevokeMessageNotification *)notification {
+    
+    if (self.eventSink) {
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnRecvRevokeMessageNotification],
+                              @"notification": notification.mj_keyValues};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+
+/**
+ *  收取消息附件回调
+ *  @param message  当前收取的消息
+ *  @param progress 进度
+ *  @discussion 附件包括:图片,视频的缩略图,语音文件
+ */
+- (void)fetchMessageAttachment:(NIMMessage *)message
+                      progress:(float)progress {
+    
+    if (self.eventSink) {
+        NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeFetchMessageAttachmentProcess],
+                              @"progress": [NSNumber numberWithFloat:progress],
+                              @"message": message.mj_keyValues};
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+}
+
+
+/**
+ *  收取消息附件完成回调
+ *
+ *  @param message 当前收取的消息
+ *  @param error   错误返回,如果收取成功,error为nil
+ */
+- (void)fetchMessageAttachment:(NIMMessage *)message
+          didCompleteWithError:(nullable NSError *)error {
+    
+    
+    if (self.eventSink) {
+        if (error == nil) {
+            
+            NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeFetchMessageAttachmentComplete],
+                                  @"msg": @"收取消息附件完成",
+                                  @"message": message.mj_keyValues};
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+            
+        }else {
+            NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"收取消息附件失败" : error.userInfo[@"NSLocalizedDescription"];
+
+            NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeFetchMessageAttachmentComplete],
+                                  @"error": @{@"msg": msg,@"errCode": [NSNumber numberWithInteger:error.code]},
+                                  @"message": message.mj_keyValues};
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+        }
+        
     }
 }
 

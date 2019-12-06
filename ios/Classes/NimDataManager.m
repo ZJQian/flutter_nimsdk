@@ -26,26 +26,31 @@
     
     NSString *avatarUrl = nil;
     NSString *thumbAvatarUrl = nil;
+    NSString *nickname = nil;
     if (session.session.sessionType == NIMSessionTypeTeam) {
         
         NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:session.session.sessionId];
         avatarUrl = team.avatarUrl;
         thumbAvatarUrl = team.thumbAvatarUrl;
+        nickname = team.teamName;
     } else if (session.session.sessionType == NIMSessionTypeSuperTeam) {
         
         NIMTeam *team = [[NIMSDK sharedSDK].superTeamManager teamById:session.session.sessionId];
         avatarUrl = team.avatarUrl;
         thumbAvatarUrl = team.thumbAvatarUrl;
+        nickname = team.teamName;
     } else {
         
         NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:session.session.sessionId];
         NIMUserInfo *userInfo = user.userInfo;
         avatarUrl = userInfo.avatarUrl;
         thumbAvatarUrl = userInfo.thumbAvatarUrl;
+        nickname = userInfo.nickName;
         
     }
     tempDic[@"avatarUrl"] = avatarUrl == nil ? @"" : avatarUrl;
     tempDic[@"thumbAvatarUrl"] = thumbAvatarUrl == nil ? @"" : thumbAvatarUrl;
+    tempDic[@"nickName"] = nickname == nil ? @"" : nickname;
     
     return tempDic;
 }

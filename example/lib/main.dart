@@ -39,8 +39,8 @@ class _HomeWidgetState extends State<HomeWidget>{
   //  27       ae93a01e9a3f087e1e85a7de731955dc
   //  184600   971ddcaa4573470245d36eecc9d78201
   
-  // int zhujiaoID = 184600;
-  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
+  // int zhujiaoID = 27;
+  // String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
   // int beijiaoID = 28;
 
   int zhujiaoID = 28;
@@ -242,7 +242,7 @@ class _HomeWidgetState extends State<HomeWidget>{
   /// 发送文本消息
   void sendText() async {
 
-    NIMSession nimSession = NIMSession(sessionId: "0",sessionType: NIMSessionType.P2P.index);
+    NIMSession nimSession = NIMSession(sessionId: beijiaoID.toString(),sessionType: NIMSessionType.P2P.index);
     await FlutterNimsdk().sendMessageText("发送文本消息", nimSession);
   }
 
