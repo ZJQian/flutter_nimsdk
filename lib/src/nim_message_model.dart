@@ -135,6 +135,7 @@ class NIMMessageObject {
   int duration; // 音频、视频的时长(毫秒)
 
   bool isPlayed; // 音频消息是否播放过
+  Map remoteExt;
 
   // 图片或视频的宽高
   int width;
@@ -169,6 +170,7 @@ class NIMMessageObject {
     this.path,
     this.duration: 0,
     this.isPlayed,
+    this.remoteExt,
     this.width: 0,
     this.height: 0,
   });
@@ -181,6 +183,7 @@ class NIMMessageObject {
     path = json['path'] ?? "";
     duration = json['duration'] ?? 0;
     isPlayed = json['isPlayed'] ?? true;
+    remoteExt = json['remoteExt'] ?? {};
     width = json['width'] ?? 0;
     height = json['height'] ?? 0;
   }
