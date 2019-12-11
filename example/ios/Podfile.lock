@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_nimsdk (1.2.2):
+  - flutter_nimsdk (1.4.5):
     - Flutter
     - MJExtension
     - NIMSDK
@@ -29,7 +29,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_nimsdk: 5a60efe5ebda455c48bc57014dbadb93ff68e3d9
+  flutter_nimsdk: 2f65ed3240679651eff70aaa61301725813cd3cb
   image_picker: e3eacd46b94694dde7cf2705955cece853aa1a8f
   MJExtension: 635f2c663dcb1bf76fa4b715b2570a5710aec545
   NIMSDK: 52ce92caa6d8f783eca25bf09e7901752abb7c25
