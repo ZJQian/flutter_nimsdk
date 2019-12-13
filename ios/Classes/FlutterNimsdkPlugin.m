@@ -420,9 +420,10 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     }else if ([@"deleteRecentSession" isEqualToString:call.method]) {
         // MARK: - //删除某个最近会话
         
+        NSArray *recentSessions = [NIMSDK sharedSDK].conversationManager.mostRecentSessions;
         NSDictionary *args = call.arguments;
         NSString *sessionID = args[@"sessionID"];
-        for (NIMRecentSession *session in self.sessions) {
+        for (NIMRecentSession *session in recentSessions) {
             if ([session.session.sessionId isEqualToString:sessionID]) {
                 [[NIMSDK sharedSDK].conversationManager deleteRecentSession:session];
             }
@@ -431,7 +432,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     }else if ([@"deleteAllRecentSession" isEqualToString:call.method]) {
         // MARK: - //删除所有最近会话
         
-        for (NIMRecentSession *session in self.sessions) {
+        NSArray *recentSessions = [NIMSDK sharedSDK].conversationManager.mostRecentSessions;
+        for (NIMRecentSession *session in recentSessions) {
             [[NIMSDK sharedSDK].conversationManager deleteRecentSession:session];
         }
         

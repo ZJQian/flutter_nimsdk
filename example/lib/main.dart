@@ -281,6 +281,10 @@ class _HomeWidgetState extends State<HomeWidget>{
     });
   }
 
+  void deleteRecentSession() async {
+    FlutterNimsdk().deleteRecentSession(beijiaoID.toString());
+  }
+
   Widget handleCall(BuildContext context) {
 
     if (showCallPage) {
@@ -475,6 +479,12 @@ class _HomeWidgetState extends State<HomeWidget>{
                         this.messagesInSessionMessage();
                       },
                       child: Text("获取消息记录"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.deleteRecentSession();
+                      },
+                      child: Text("删除最近通话"),
                     )
                   ],
                 ),
