@@ -528,6 +528,13 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         [[[NIMSDK sharedSDK] conversationManager] markAllMessagesRead];
         
+    }else if ([@"markAllMessagesReadInSession" isEqualToString:call.method]) {//设置一个会话里所有消息置为已读
+        
+        NSDictionary *args = call.arguments;
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        //只有当消息所属会话时会话页表示的会话时，才标记已读
+        [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:session];
+        
     }else if ([@"deleteMessage" isEqualToString:call.method]) {// 删除某条消息
         
         NIMMessage *message = [NIMMessage mj_objectWithKeyValues:call.arguments];

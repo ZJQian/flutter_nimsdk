@@ -243,6 +243,11 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("markAllMessagesRead");
   }
 
+  /// 设置一个会话里所有消息置为已读
+  Future<void> markAllMessagesReadInSession(NIMSession session) async {
+    return await _channel.invokeMethod("markAllMessagesReadInSession",{"session":session.toJson()});
+  }
+
   /// 删除某条消息
   Future<void> deleteMessage(NIMMessage message) async {
     return await _channel.invokeMethod("deleteMessage",message.toJson());

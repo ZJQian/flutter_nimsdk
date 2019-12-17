@@ -1,5 +1,5 @@
-## 1.4.6
-* bug fix
+## 1.4.7
+* add api
 
 ## 1.4.1
 * add netCallControlType && callback
