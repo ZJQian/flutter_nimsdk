@@ -336,8 +336,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 NSMutableArray *recordArray = [NSMutableArray array];
                 for (NIMMessage *msg in records) {
                     
-                    msg.messageObject = nil;
-                    NSMutableDictionary *dict = [msg mj_keyValues];
+                    NSDictionary *dict = [[NimDataManager shared] handleNIMMessage:msg];
                     [recordArray addObject:dict];
                 }
                 NSDictionary *dic = @{@"records": recordArray};
@@ -395,8 +394,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         self.sessions = [NSMutableArray arrayWithArray:recentSessions];
         NSMutableArray *array = [NSMutableArray array];
         for (NIMRecentSession *session in recentSessions) {
-            session.lastMessage.messageObject = nil;
             NSMutableDictionary *tempDic = [[NimDataManager shared] configSessionWith:session];
+            tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:session.lastMessage];
             [array addObject:tempDic];
         }
         NSDictionary *dic = @{@"mostRecentSessions": array};
@@ -409,9 +408,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         self.sessions = [NSMutableArray arrayWithArray:recentSessions];
         NSMutableArray *array = [NSMutableArray array];
         for (NIMRecentSession *session in recentSessions) {
-            session.lastMessage.messageObject = nil;
             NSMutableDictionary *tempDic = [[NimDataManager shared] configSessionWith:session];
-            
+            tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:session.lastMessage];
             [array addObject:tempDic];
         }
         NSDictionary *dic = @{@"allRecentSessions": array};
@@ -1005,8 +1003,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
     if (self.eventSink) {
         
-        recentSession.lastMessage.messageObject = nil;
-        NSDictionary *tempDic = [recentSession mj_keyValues];
+        NSMutableDictionary *tempDic = [recentSession mj_keyValues];
+        tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:recentSession.lastMessage];
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeDidAddRecentSession],
                               @"totalUnreadCount": [NSNumber numberWithInteger:totalUnreadCount],
                               @"recentSession": tempDic};
@@ -1029,8 +1027,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
               totalUnreadCount:(NSInteger)totalUnreadCount {
     
     if (self.eventSink) {
-        recentSession.lastMessage.messageObject = nil;
-        NSDictionary *tempDic = [recentSession mj_keyValues];
+        NSMutableDictionary *tempDic = [recentSession mj_keyValues];
+        tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:recentSession.lastMessage];
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeDidUpdateRecentSession],
                               @"totalUnreadCount": [NSNumber numberWithInteger:totalUnreadCount],
                               @"recentSession": tempDic};
@@ -1049,8 +1047,9 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
               totalUnreadCount:(NSInteger)totalUnreadCount {
     
     if (self.eventSink) {
-        recentSession.lastMessage.messageObject = nil;
-        NSDictionary *tempDic = [recentSession mj_keyValues];
+        NSMutableDictionary *tempDic = [recentSession mj_keyValues];
+        tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:recentSession.lastMessage];
+
         NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeDidRemoveRecentSession],
                               @"totalUnreadCount": [NSNumber numberWithInteger:totalUnreadCount],
                               @"recentSession": tempDic};
