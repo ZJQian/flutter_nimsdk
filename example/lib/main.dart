@@ -254,6 +254,13 @@ class _HomeWidgetState extends State<HomeWidget>{
     FlutterNimsdk().sendMessageImage(image.path, nimSession);
   }
 
+  ///发送视频消息
+  void sendVideo() async {
+    var video = await ImagePicker.pickVideo(source: ImageSource.gallery);
+    NIMSession nimSession = NIMSession(sessionId: beijiaoID.toString(),sessionType: NIMSessionType.P2P.index);
+    FlutterNimsdk().sendMessageVideo(video.path, nimSession);
+  }
+
   ///发送已读消息回执
   void sendMessageReceipt() async {
     NIMMessage message = NIMMessage(from: "",messageId: "");
@@ -283,6 +290,11 @@ class _HomeWidgetState extends State<HomeWidget>{
 
   void deleteRecentSession() async {
     FlutterNimsdk().deleteRecentSession(beijiaoID.toString());
+  }
+
+  void sendCustomMessage() async {
+    NIMSession session = NIMSession(sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
+    await FlutterNimsdk().sendMessageCustom(session, {"custom": "自定义消息"});
   }
 
   Widget handleCall(BuildContext context) {
@@ -464,6 +476,12 @@ class _HomeWidgetState extends State<HomeWidget>{
                     ),
                     RaisedButton(
                       onPressed: (){
+                        this.sendVideo();
+                      },
+                      child: Text("发送视频消息"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
                         this.sendMessageReceipt();
                       },
                       child: Text("发送消息回执"),
@@ -485,6 +503,12 @@ class _HomeWidgetState extends State<HomeWidget>{
                         this.deleteRecentSession();
                       },
                       child: Text("删除最近通话"),
+                    ),
+                    RaisedButton(
+                      onPressed: (){
+                        this.sendCustomMessage();
+                      },
+                      child: Text("发送自定义消息"),
                     )
                   ],
                 ),

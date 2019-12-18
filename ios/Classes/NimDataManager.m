@@ -7,6 +7,7 @@
 
 #import "NimDataManager.h"
 #import <MJExtension/MJExtension.h>
+#import "IMCustomAttachment.h"
 
 @implementation NimDataManager
 
@@ -94,7 +95,7 @@
         
         NIMImageObject *imgObj = (NIMImageObject *)message.messageObject;
         imgObj.message.messageObject = nil;
-        tempDic[@"messageObject"] = [imgObj mj_keyValuesWithIgnoredKeys:@[@"size"]];
+        tempDic = [imgObj.message mj_keyValuesWithIgnoredKeys:@[@"size"]];
     
     }else if (message.messageType == NIMMessageTypeNotification) {
         
@@ -111,56 +112,58 @@
         
         NIMAudioObject *audio = (NIMAudioObject *)message.messageObject;
         audio.message.messageObject = nil;
-        NSMutableDictionary *contentDic = audio.mj_keyValues;
-        tempDic[@"messageObject"] = contentDic;
+        NSMutableDictionary *contentDic = audio.message.mj_keyValues;
+        tempDic = contentDic;
         
     }else if (message.messageType == NIMMessageTypeVideo) {
         
         NIMVideoObject *video = (NIMVideoObject *)message.messageObject;
         video.message.messageObject = nil;
-        NSMutableDictionary *contentDic = [video mj_keyValuesWithIgnoredKeys:@[@"coverSize"]];
+        NSMutableDictionary *contentDic = [video.message mj_keyValuesWithIgnoredKeys:@[@"coverSize"]];
         
-        tempDic[@"messageObject"] = contentDic;
+        tempDic = contentDic;
         
     }else if (message.messageType == NIMMessageTypeLocation) {
         
         NIMLocationObject *location = (NIMLocationObject *)message.messageObject;
         location.message.messageObject = nil;
-        NSMutableDictionary *contentDic = location.mj_keyValues;
+        NSMutableDictionary *contentDic = location.message.mj_keyValues;
         
-        tempDic[@"messageObject"] = contentDic;
+        tempDic = contentDic;
         
     }else if (message.messageType == NIMMessageTypeFile) {
         
         NIMFileObject *file = (NIMFileObject *)message.messageObject;
         file.message.messageObject = nil;
-        NSMutableDictionary *contentDic = file.mj_keyValues;
+        NSMutableDictionary *contentDic = file.message.mj_keyValues;
         
-        tempDic[@"messageObject"] = contentDic;
+        tempDic = contentDic;
         
     }else if (message.messageType == NIMMessageTypeTip) {
         
         NIMTipObject *tip = (NIMTipObject *)message.messageObject;
         tip.message.messageObject = nil;
-        NSMutableDictionary *contentDic = tip.mj_keyValues;
+        NSMutableDictionary *contentDic = tip.message.mj_keyValues;
         
-        tempDic[@"messageObject"] = contentDic;
+        tempDic = contentDic;
         
     }else if (message.messageType == NIMMessageTypeRobot) {
         
         NIMRobotObject *robot = (NIMRobotObject *)message.messageObject;
         robot.message.messageObject = nil;
-        NSMutableDictionary *contentDic = robot.mj_keyValues;
+        NSMutableDictionary *contentDic = robot.message.mj_keyValues;
         
-        tempDic[@"messageObject"] = contentDic;
+        tempDic = contentDic;
         
     }else if (message.messageType == NIMMessageTypeCustom) {
         
         NIMCustomObject *custom = (NIMCustomObject *)message.messageObject;
         custom.message.messageObject = nil;
-        NSMutableDictionary *contentDic = custom.mj_keyValues;
-        
-        tempDic[@"messageObject"] = contentDic;
+        IMCustomAttachment *attachment = (IMCustomAttachment *)custom.attachment;
+        custom.attachment = nil;
+        NSMutableDictionary *contentDic = custom.message.mj_keyValues;
+        tempDic = contentDic;
+        tempDic[@"attachment"] = attachment.mj_keyValues;
         
     }
     

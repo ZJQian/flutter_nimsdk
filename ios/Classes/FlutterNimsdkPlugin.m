@@ -5,6 +5,9 @@
 #import "NimDataManager.h"
 #import "VideoChat/VideoChatViewController.h"
 #import "FlutterNimViewFactory.h"
+#import "IMCustomAttachment.h"
+#import "IMCustomMessageAttachmentDecoder.h"
+#import "VideoManager.h"
 //#import "FaceunityManager/FUManager.h"
 
 
@@ -146,7 +149,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     
-    NSLog(@"**************************************************************\n \n  call.method ===> %@  \n call.arguments ==> %@ \n \n**************************************************************\n",call.method,call.arguments);
+    NSLog(@"\n**************************************************************\n \n  call.method ===> %@  \n call.arguments ==> %@ \n \n**************************************************************\n",call.method,call.arguments);
 
     if ([@"initSDK" isEqualToString:call.method]) {// 初始化
         
@@ -171,6 +174,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         }
         
         [[NIMSDK sharedSDK] registerWithOption: option];
+        [NIMCustomObject registerCustomDecoder:[[IMCustomMessageAttachmentDecoder alloc] init]];
         
         //为了更好的应用体验，SDK 需要对应用数据做一些本地持久，比如消息，用户信息等等。在默认情况下，所有数据将放置于 $Document/NIMSDK 目录下。
         //设置该值后 SDK 产生的数据(包括聊天记录，但不包括临时文件)都将放置在这个目录下
@@ -494,6 +498,10 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         [self sendMessage: NIMMessageTypeLocation args:call.arguments];
         
+    }else if ([@"sendCustomMessage" isEqualToString:call.method]) {//自定义消息
+        
+        [self sendCustomMessage:call.arguments];
+        
     }else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
         
         self.sessionID = call.arguments[@"sessionId"];
@@ -791,11 +799,21 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
     }else if (messageType == NIMMessageTypeVideo) {
         
-        // 获得视频附件对象
-        NIMVideoObject *object = [[NIMVideoObject alloc] initWithSourcePath:args[@"videoPath"]];
-        message.messageObject        = object;
-        NSError *error = nil;
-        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
+        NSString *path = args[@"videoPath"];
+        [[VideoManager sharedManager] mov2mp4:[NSURL fileURLWithPath:path] completed:^(AVAssetExportSessionStatus status, NSString * _Nonnull videoPath) {
+            
+            NSLog(@"%ld",(long)status);
+            if (status == AVAssetExportSessionStatusCompleted) {
+                
+                // 获得视频附件对象
+                NIMVideoObject *object = [[NIMVideoObject alloc] initWithSourcePath:videoPath];
+                message.messageObject        = object;
+                NSError *error = nil;
+                [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
+            }
+        }];
+        
+        
     }else if (messageType == NIMMessageTypeAudio) {
         
         // 获得音附件对象
@@ -830,6 +848,27 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSError *error = nil;
         [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
     }
+}
+
+- (void)sendCustomMessage:(NSDictionary *)args
+{
+    NSString *sessionId = args[@"sessionId"];
+    NSString *customEncodeString = args[@"customEncodeString"];
+    NSString *apnsContent = args[@"apnsContent"];
+    NIMMessage *message = [[NIMMessage alloc] init];
+    NIMSession *session = [NIMSession session:sessionId type:NIMSessionTypeP2P];
+    
+    IMCustomAttachment *attachment = [[IMCustomAttachment alloc] init];
+    attachment.customEncodeString = customEncodeString;
+     // 获得自定义附件对象
+    NIMCustomObject *object = [[NIMCustomObject alloc] init];
+    object.attachment = attachment;
+    message.messageObject        = object;
+    message.apnsContent = apnsContent;
+//    NSError *error = nil;
+    [[[NIMSDK sharedSDK] chatManager] sendMessage:message toSession:session completion:^(NSError * _Nullable error) {
+        NSLog(@"%@",error);
+    }];
 }
 
 
@@ -1186,10 +1225,10 @@ didCompleteWithError:(nullable NSError *)error {
             
         }else {
             NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"消息发送失败" : error.userInfo[@"NSLocalizedDescription"];
-
+            
             NSDictionary *dic = @{@"delegateType": [NSNumber numberWithInt:NIMDelegateTypeSendMessageComplete],
                                   @"error": @{@"msg": msg,@"errCode": [NSNumber numberWithInteger:error.code]},
-                                  @"message": [[NimDataManager shared] handleNIMMessage:message]};
+                                  @"message": [[NimDataManager shared] handleNIMMessage:message] == nil ? @"" : [[NimDataManager shared] handleNIMMessage:message]};
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
         }
         
