@@ -8,6 +8,7 @@
 #import "IMCustomAttachment.h"
 #import "IMCustomMessageAttachmentDecoder.h"
 #import "VideoManager.h"
+#import "NimSessionParser.h"
 //#import "FaceunityManager/FUManager.h"
 
 
@@ -396,28 +397,34 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         NSArray *recentSessions = [NIMSDK sharedSDK].conversationManager.mostRecentSessions;
         self.sessions = [NSMutableArray arrayWithArray:recentSessions];
-        NSMutableArray *array = [NSMutableArray array];
+        NSMutableArray *users = [NSMutableArray array];
         for (NIMRecentSession *session in recentSessions) {
-            NSMutableDictionary *tempDic = [[NimDataManager shared] configSessionWith:session];
-            tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:session.lastMessage];
-            [array addObject:tempDic];
+
+            [users addObject:session.session.sessionId];
         }
-        NSDictionary *dic = @{@"mostRecentSessions": array};
-        result([[NimDataManager shared] dictionaryToJson:dic]);
+        [[[NIMSDK sharedSDK] userManager] fetchUserInfos:users completion:^(NSArray<NIMUser *> * _Nullable users, NSError * _Nullable error) {
+            
+            NSArray *array = [[NimSessionParser shared] handleRecentSessions:recentSessions users:users];
+            NSDictionary *dic = @{@"mostRecentSessions": array};
+            result([[NimDataManager shared] dictionaryToJson:dic]);
+        }];
+        
         
     }else if ([@"allRecentSessions" isEqualToString:call.method]) {
         // MARK: - // 获取所有最近100条会话
         
         NSArray *recentSessions = [NIMSDK sharedSDK].conversationManager.allRecentSessions;
         self.sessions = [NSMutableArray arrayWithArray:recentSessions];
-        NSMutableArray *array = [NSMutableArray array];
+        NSMutableArray *users = [NSMutableArray array];
         for (NIMRecentSession *session in recentSessions) {
-            NSMutableDictionary *tempDic = [[NimDataManager shared] configSessionWith:session];
-            tempDic[@"lastMessage"] = [[NimDataManager shared] handleNIMMessage:session.lastMessage];
-            [array addObject:tempDic];
+            [users addObject:session.session.sessionId];
         }
-        NSDictionary *dic = @{@"allRecentSessions": array};
-        result([[NimDataManager shared] dictionaryToJson:dic]);
+        [[[NIMSDK sharedSDK] userManager] fetchUserInfos:users completion:^(NSArray<NIMUser *> * _Nullable users, NSError * _Nullable error) {
+            
+            NSArray *array = [[NimSessionParser shared] handleRecentSessions:recentSessions users:users];
+            NSDictionary *dic = @{@"allRecentSessions": array};
+            result([[NimDataManager shared] dictionaryToJson:dic]);
+        }];
         
     }else if ([@"deleteRecentSession" isEqualToString:call.method]) {
         // MARK: - //删除某个最近会话
@@ -800,31 +807,24 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     }else if (messageType == NIMMessageTypeVideo) {
         
         NSString *path = args[@"videoPath"];
-        [[VideoManager sharedManager] mov2mp4:[NSURL fileURLWithPath:path] completed:^(AVAssetExportSessionStatus status, NSString * _Nonnull videoPath) {
-            
-            NSLog(@"%ld",(long)status);
-            if (status == AVAssetExportSessionStatusCompleted) {
-                
-                // 获得视频附件对象
-                NIMVideoObject *object = [[NIMVideoObject alloc] initWithSourcePath:videoPath];
-                message.messageObject        = object;
-                NSError *error = nil;
-                [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
-            }
-        }];
+        // 获得视频附件对象
+        NIMVideoObject *object = [[NIMVideoObject alloc] initWithSourcePath:path scene:NIMNOSSceneTypeMessage];
+        message.messageObject        = object;
+        NSError *error = nil;
+        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
         
         
     }else if (messageType == NIMMessageTypeAudio) {
         
         // 获得音附件对象
-        NIMAudioObject *object = [[NIMAudioObject alloc] initWithSourcePath:args[@"audioPath"]];
+        NIMAudioObject *object = [[NIMAudioObject alloc] initWithSourcePath:args[@"audioPath"] scene:NIMNOSSceneTypeMessage];
         message.messageObject        = object;
         NSError *error = nil;
         [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
     }else if (messageType == NIMMessageTypeFile) {
         
         // 获得文件附件对象
-         NIMFileObject *object = [[NIMFileObject alloc] initWithSourcePath:args[@"filePath"]];
+         NIMFileObject *object = [[NIMFileObject alloc] initWithSourcePath:args[@"filePath"] scene:NIMNOSSceneTypeMessage];
         message.messageObject        = object;
         NSError *error = nil;
         [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
@@ -865,10 +865,11 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     object.attachment = attachment;
     message.messageObject        = object;
     message.apnsContent = apnsContent;
-//    NSError *error = nil;
-    [[[NIMSDK sharedSDK] chatManager] sendMessage:message toSession:session completion:^(NSError * _Nullable error) {
-        NSLog(@"%@",error);
-    }];
+    NSError *error = nil;
+    [[[NIMSDK sharedSDK] chatManager] sendMessage:message toSession:session error:&error];
+//    [[[NIMSDK sharedSDK] chatManager] sendMessage:message toSession:session completion:^(NSError * _Nullable error) {
+//        NSLog(@"%@",error);
+//    }];
 }
 
 

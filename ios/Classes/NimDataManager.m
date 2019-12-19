@@ -41,7 +41,7 @@
         thumbAvatarUrl = team.thumbAvatarUrl;
         nickname = team.teamName;
     } else {
-        
+    
         NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:session.session.sessionId];
         NIMUserInfo *userInfo = user.userInfo;
         avatarUrl = userInfo.avatarUrl;
@@ -94,8 +94,14 @@
     }else if (message.messageType == NIMMessageTypeImage) {
         
         NIMImageObject *imgObj = (NIMImageObject *)message.messageObject;
-        imgObj.message.messageObject = nil;
-        tempDic = [imgObj.message mj_keyValuesWithIgnoredKeys:@[@"size"]];
+        NSMutableDictionary *contentDic = [NSMutableDictionary dictionary];
+        contentDic[@"url"] = imgObj.url == nil ? @"" : imgObj.url;
+        contentDic[@"thumbUrl"] = imgObj.thumbUrl == nil ? @"" : imgObj.thumbUrl;
+        contentDic[@"thumbPath"] = imgObj.thumbPath == nil ? @"" : imgObj.thumbPath;
+        contentDic[@"path"] = imgObj.path == nil ? @"" : imgObj.path;
+        contentDic[@"width"] = [NSNumber numberWithFloat:imgObj.size.width];
+        contentDic[@"height"] = [NSNumber numberWithFloat:imgObj.size.height];
+        tempDic[@"messageObject"] = contentDic;
     
     }else if (message.messageType == NIMMessageTypeNotification) {
         
@@ -111,50 +117,57 @@
     }else if (message.messageType == NIMMessageTypeAudio) {
         
         NIMAudioObject *audio = (NIMAudioObject *)message.messageObject;
-        audio.message.messageObject = nil;
-        NSMutableDictionary *contentDic = audio.message.mj_keyValues;
-        tempDic = contentDic;
-        
+        NSMutableDictionary *contentDic = [NSMutableDictionary dictionary];
+        contentDic[@"url"] = audio.url == nil ? @"" : audio.url;
+        contentDic[@"path"] = audio.path == nil ? @"" : audio.path;
+        contentDic[@"duration"] = [NSNumber numberWithInteger:audio.duration];
+        contentDic[@"isPlayed"] = [NSNumber numberWithBool:message.isPlayed];
+        tempDic[@"messageObject"] = contentDic;
+
     }else if (message.messageType == NIMMessageTypeVideo) {
         
         NIMVideoObject *video = (NIMVideoObject *)message.messageObject;
-        video.message.messageObject = nil;
-        NSMutableDictionary *contentDic = [video.message mj_keyValuesWithIgnoredKeys:@[@"coverSize"]];
-        
-        tempDic = contentDic;
+        NSMutableDictionary *contentDic = [NSMutableDictionary dictionary];
+        contentDic[@"url"] = video.url == nil ? @"" : video.url;
+        contentDic[@"coverUrl"] = video.coverUrl == nil ? @"" : video.coverUrl;
+        contentDic[@"path"] = video.path == nil ? @"" : video.path;
+        contentDic[@"duration"] = [NSNumber numberWithInteger:video.duration];
+        contentDic[@"width"] = [NSNumber numberWithFloat:video.coverSize.width];
+        contentDic[@"height"] = [NSNumber numberWithFloat:video.coverSize.height];
+        tempDic[@"messageObject"] = contentDic;
         
     }else if (message.messageType == NIMMessageTypeLocation) {
         
         NIMLocationObject *location = (NIMLocationObject *)message.messageObject;
         location.message.messageObject = nil;
-        NSMutableDictionary *contentDic = location.message.mj_keyValues;
+        NSMutableDictionary *contentDic = [location mj_keyValues];
         
-        tempDic = contentDic;
-        
+        tempDic[@"messageObject"] = contentDic;
+
     }else if (message.messageType == NIMMessageTypeFile) {
         
         NIMFileObject *file = (NIMFileObject *)message.messageObject;
         file.message.messageObject = nil;
-        NSMutableDictionary *contentDic = file.message.mj_keyValues;
+        NSMutableDictionary *contentDic = [file mj_keyValues];
         
-        tempDic = contentDic;
-        
+        tempDic[@"messageObject"] = contentDic;
+
     }else if (message.messageType == NIMMessageTypeTip) {
         
         NIMTipObject *tip = (NIMTipObject *)message.messageObject;
         tip.message.messageObject = nil;
-        NSMutableDictionary *contentDic = tip.message.mj_keyValues;
+        NSMutableDictionary *contentDic = [tip mj_keyValues];
         
-        tempDic = contentDic;
-        
+        tempDic[@"messageObject"] = contentDic;
+
     }else if (message.messageType == NIMMessageTypeRobot) {
         
         NIMRobotObject *robot = (NIMRobotObject *)message.messageObject;
         robot.message.messageObject = nil;
-        NSMutableDictionary *contentDic = robot.message.mj_keyValues;
+        NSMutableDictionary *contentDic = [robot mj_keyValues];
         
-        tempDic = contentDic;
-        
+        tempDic[@"messageObject"] = contentDic;
+
     }else if (message.messageType == NIMMessageTypeCustom) {
         
         NIMCustomObject *custom = (NIMCustomObject *)message.messageObject;
@@ -165,6 +178,10 @@
         tempDic = contentDic;
         tempDic[@"attachment"] = attachment.mj_keyValues;
         
+    }
+    
+    if (tempDic == nil) {
+        tempDic = [NSMutableDictionary dictionaryWithDictionary:@{}];
     }
     
     return tempDic;
