@@ -49,6 +49,7 @@ typedef enum : NSUInteger {
 @property(nonatomic) FlutterEventSink eventSink;
 @property(nonatomic, strong) FlutterMethodChannel *methodChannel;
 @property(nonatomic, strong) NSMutableArray *sessions;
+@property(nonatomic, strong) NSMutableArray *messages;
 
 /// 录音时长
 @property(nonatomic, assign) NSTimeInterval recordTime;
@@ -453,8 +454,21 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
         NSArray *messageIds = args[@"messageIds"];
         NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:messageIds];
+        self.messages = [NSMutableArray arrayWithArray:messages];
         NSArray *messageDics = [NIMMessage mj_keyValuesArrayWithObjectArray:messages];
         result([[NimDataManager shared] dictionaryToJson:@{@"messages": messageDics}]);
+        
+    }else if ([@"markAudioMessageRead" isEqualToString:call.method]) {
+        // MARK: - 语音消息已读
+        NSDictionary *args = call.arguments;
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        NSString *messageId = args[@"messageId"];
+        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:@[messageId]];
+        for (NIMMessage *message in messages) {
+            if ([message.messageId isEqualToString:messageId]) {
+                message.isPlayed = YES;
+            }
+        }
         
     }else if ([@"messagesInSessionMessage" isEqualToString:call.method]) {
         // MARK: - 从本地db读取一个会话里某条消息之前的若干条的消息
@@ -1337,6 +1351,13 @@ didCompleteWithError:(nullable NSError *)error {
         _sessions = [NSMutableArray array];
     }
     return _sessions;
+}
+
+- (NSMutableArray *)messages {
+    if (!_messages) {
+        _messages = [NSMutableArray array];
+    }
+    return _messages;
 }
 
 - (void)dealloc {

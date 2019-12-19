@@ -48,6 +48,7 @@
         thumbAvatarUrl = userInfo.thumbAvatarUrl;
         nickname = userInfo.nickName;
         
+        
     }
     tempDic[@"avatarUrl"] = avatarUrl == nil ? @"" : avatarUrl;
     tempDic[@"thumbAvatarUrl"] = thumbAvatarUrl == nil ? @"" : thumbAvatarUrl;
@@ -73,7 +74,7 @@
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&err];
     if(err) {
         NSLog(@"json解析失败：%@",err);
-        return nil;
+        return @{};
     }
     return dic;
 }
@@ -175,8 +176,8 @@
         IMCustomAttachment *attachment = (IMCustomAttachment *)custom.attachment;
         custom.attachment = nil;
         NSMutableDictionary *contentDic = custom.message.mj_keyValues;
-        tempDic = contentDic;
-        tempDic[@"attachment"] = attachment.mj_keyValues;
+        tempDic[@"messageObject"] = contentDic;
+        tempDic[@"messageObject"][@"attachment"] = attachment.mj_keyValues;
         
     }
     
