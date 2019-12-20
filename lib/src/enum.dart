@@ -95,34 +95,32 @@ enum NIMMessageSearchOrder {
 }
 
 enum NIMNetCallControlType {
-
-    // 开启了音频
-    openAudio,
-    //关闭了音频
-    closeAudio,
-    //开启了视频
-    openVideo,
-    //关闭了视频
-    closeVideo,
-    //切换到视频模式
-    toVideo,
-    //同意切换到视频模式，用于切到视频模式需要对方同意的场景
-    agreeToVideo,
-    //拒绝切换到视频模式，用于切到视频模式需要对方同意的场景
-    rejectToVideo,
-    //切换到音频模式
-    toAudio,
-    //占线
-    busyLine,
-    //没有可用摄像头
-    noCamera,
-    //应用切换到了后台
-    background,
-    //收到呼叫请求的反馈，通常用于被叫告诉主叫可以播放回铃音了
-    feedabck,
-    //开始录制
-    startRecord,
-    //结束录制
-    stopRecord,
+  // 开启了音频
+  openAudio,
+  //关闭了音频
+  closeAudio,
+  //开启了视频
+  openVideo,
+  //关闭了视频
+  closeVideo,
+  //切换到视频模式
+  toVideo,
+  //同意切换到视频模式，用于切到视频模式需要对方同意的场景
+  agreeToVideo,
+  //拒绝切换到视频模式，用于切到视频模式需要对方同意的场景
+  rejectToVideo,
+  //切换到音频模式
+  toAudio,
+  //占线
+  busyLine,
+  //没有可用摄像头
+  noCamera,
+  //应用切换到了后台
+  background,
+  //收到呼叫请求的反馈，通常用于被叫告诉主叫可以播放回铃音了
+  feedabck,
+  //开始录制
+  startRecord,
+  //结束录制
+  stopRecord,
 }
-

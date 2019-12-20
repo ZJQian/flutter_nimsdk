@@ -1,7 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'config.g.dart';
 
-
 ///可自定义的SDK选项设置
 @JsonSerializable()
 class SDKOptions {
@@ -110,7 +109,8 @@ class SDKOptions {
       this.useAssetServerAddressConfig = false});
 
   //不同的类使用不同的mixin即可
-  factory SDKOptions.fromJson(Map<String, dynamic> json) => _$SDKOptionsFromJson(json);
+  factory SDKOptions.fromJson(Map<String, dynamic> json) =>
+      _$SDKOptionsFromJson(json);
 
   Map<String, dynamic> toJson() => _$SDKOptionsToJson(this);
 }
@@ -210,7 +210,8 @@ class UserInfoProvider {
   UserInfoProvider();
 
   //不同的类使用不同的mixin即可
-  factory UserInfoProvider.fromJson(Map<String, dynamic> json) => _$UserInfoProviderFromJson(json);
+  factory UserInfoProvider.fromJson(Map<String, dynamic> json) =>
+      _$UserInfoProviderFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserInfoProviderToJson(this);
 }
@@ -259,7 +260,8 @@ class ServerAddresses {
   final bool test;
 
   //不同的类使用不同的mixin即可
-  factory ServerAddresses.fromJson(Map<String, dynamic> json) => _$ServerAddressesFromJson(json);
+  factory ServerAddresses.fromJson(Map<String, dynamic> json) =>
+      _$ServerAddressesFromJson(json);
 
   Map<String, dynamic> toJson() => _$ServerAddressesToJson(this);
 }
@@ -314,7 +316,8 @@ class MixPushConfig {
   final String pkCername;
 
   //不同的类使用不同的mixin即可
-  factory MixPushConfig.fromJson(Map<String, dynamic> json) => _$MixPushConfigFromJson(json);
+  factory MixPushConfig.fromJson(Map<String, dynamic> json) =>
+      _$MixPushConfigFromJson(json);
 
   Map<String, dynamic> toJson() => _$MixPushConfigToJson(this);
 }
@@ -340,57 +343,58 @@ class LoginInfo {
   LoginInfo({this.account, this.token, this.appKey, this.forcedMode});
 
   //不同的类使用不同的mixin即可
-  factory LoginInfo.fromJson(Map<String, dynamic> json) => _$LoginInfoFromJson(json);
+  factory LoginInfo.fromJson(Map<String, dynamic> json) =>
+      _$LoginInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$LoginInfoToJson(this);
 }
 
 @JsonSerializable()
 class NIMNetCallOption {
-
   final String extendMessage;
   final String apnsContent;
   final String apnsSound;
 
-  NIMNetCallOption({this.extendMessage,this.apnsContent,this.apnsSound});
+  NIMNetCallOption({this.extendMessage, this.apnsContent, this.apnsSound});
 
-  factory NIMNetCallOption.fromJson(Map<String, dynamic> json) => _$NIMNetCallOptionFromJson(json);
+  factory NIMNetCallOption.fromJson(Map<String, dynamic> json) =>
+      _$NIMNetCallOptionFromJson(json);
   Map<String, dynamic> toJson() => _$NIMNetCallOptionToJson(this);
 }
 
 @JsonSerializable()
 class NIMResponse {
-
   final String callID;
   final bool accept;
 
-  NIMResponse({this.callID,this.accept});
+  NIMResponse({this.callID, this.accept});
 
-  factory NIMResponse.fromJson(Map<String, dynamic> json) => _$NIMResponseFromJson(json);
+  factory NIMResponse.fromJson(Map<String, dynamic> json) =>
+      _$NIMResponseFromJson(json);
   Map<String, dynamic> toJson() => _$NIMResponseToJson(this);
 }
 
 @JsonSerializable()
 class NIMSession {
-
   final String sessionId;
   final int sessionType;
 
-  NIMSession({this.sessionId,this.sessionType});
+  NIMSession({this.sessionId, this.sessionType});
 
-  factory NIMSession.fromJson(Map<String, dynamic> json) => _$NIMSessionFromJson(json);
+  factory NIMSession.fromJson(Map<String, dynamic> json) =>
+      _$NIMSessionFromJson(json);
   Map<String, dynamic> toJson() => _$NIMSessionToJson(this);
 }
 
 @JsonSerializable()
 class NIMLocationObject {
-
   final double latitude;
   final double longitude;
   final String title;
 
-  NIMLocationObject({this.latitude,this.longitude,this.title});
+  NIMLocationObject({this.latitude, this.longitude, this.title});
 
-  factory NIMLocationObject.fromJson(Map<String, dynamic> json) => _$NIMLocationObjectFromJson(json);
+  factory NIMLocationObject.fromJson(Map<String, dynamic> json) =>
+      _$NIMLocationObjectFromJson(json);
   Map<String, dynamic> toJson() => _$NIMLocationObjectToJson(this);
 }

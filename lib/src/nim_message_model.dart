@@ -108,7 +108,6 @@ class NIMMessage {
   }
 
   Map<String, dynamic> toJson() {
-
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['from'] = this.from;
     data['messageId'] = this.messageId;
@@ -121,10 +120,7 @@ class NIMMessage {
     data['customMessageContent'] = this.customMessageContent;
     return data;
   }
-
 }
-
-
 
 class NIMMessageObject {
   String url; // 图片、音频、视频的远程路径
@@ -207,5 +203,3 @@ class NIMDeleteMessagesOption {
     return data;
   }
 }
-
-

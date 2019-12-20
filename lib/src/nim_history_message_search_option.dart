@@ -1,7 +1,6 @@
 import 'enum.dart';
 import 'nim_message_model.dart';
 
-
 class NIMHistoryMessageSearchOption {
   int startTime;
   int limit;

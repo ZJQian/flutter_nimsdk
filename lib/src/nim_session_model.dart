@@ -40,6 +40,3 @@ class NIMRecentSession {
         : null;
   }
 }
-
-
-
