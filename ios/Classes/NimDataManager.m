@@ -174,10 +174,10 @@
         NIMCustomObject *custom = (NIMCustomObject *)message.messageObject;
         custom.message.messageObject = nil;
         IMCustomAttachment *attachment = (IMCustomAttachment *)custom.attachment;
-        custom.attachment = nil;
+//        custom.attachment = nil;
         NSMutableDictionary *contentDic = custom.message.mj_keyValues;
         tempDic[@"messageObject"] = contentDic;
-        tempDic[@"messageObject"][@"attachment"] = attachment.mj_keyValues;
+        tempDic[@"attachment"] = [attachment encodeAttachment];
         
     }
     

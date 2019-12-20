@@ -44,7 +44,7 @@ class _RecentListPageState extends State<RecentListPage> {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(bottom: BorderSide(color: Colors.black, width: 1))),
+          border: Border(bottom: BorderSide(color: Colors.black, width: 0.5))),
       child: Row(
         children: <Widget>[
           thumbAvatarUrl == null
@@ -54,7 +54,7 @@ class _RecentListPageState extends State<RecentListPage> {
                   height: 50,
                 )
               : Image.network(
-                  item["thumbAvatarUrl"],
+                  thumbAvatarUrl,
                   width: 50,
                   height: 50,
                 ),
