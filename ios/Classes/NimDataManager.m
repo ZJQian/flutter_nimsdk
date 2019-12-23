@@ -172,10 +172,9 @@
     }else if (message.messageType == NIMMessageTypeCustom) {
         
         NIMCustomObject *custom = (NIMCustomObject *)message.messageObject;
-        custom.message.messageObject = nil;
         IMCustomAttachment *attachment = (IMCustomAttachment *)custom.attachment;
 //        custom.attachment = nil;
-        NSMutableDictionary *contentDic = custom.message.mj_keyValues;
+        NSMutableDictionary *contentDic = [custom.message mj_keyValuesWithIgnoredKeys:@[@"messageObject"]];
         tempDic[@"messageObject"] = contentDic;
         tempDic[@"attachment"] = [attachment encodeAttachment];
         

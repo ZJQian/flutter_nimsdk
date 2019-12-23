@@ -997,6 +997,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)willSendMessage:(NIMMessage *)message
 {
     if (self.eventSink) {
+        
         NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeWillSendMessage],
                                @"message": [[NimDataManager shared] handleNIMMessage:message] };
         self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
@@ -1053,7 +1054,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                                    @"message": [[NimDataManager shared] handleNIMMessage:message] };
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
 
-            if (message.messageType == NIMMessageTypeVideo) {
+            if (message.messageType == NIMMessageTypeVideo || message.messageType == NIMMessageTypeCustom) {
                 NSDictionary *dict = [[NimDataManager shared] handleNIMMessage:message];
                 NSDictionary *tempDic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnRecvMessages],
                                            @"message": @[dict] };
