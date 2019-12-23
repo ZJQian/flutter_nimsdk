@@ -41,9 +41,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
   // int beijiaoID = 27;
 
-  int zhujiaoID = 28;
-  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  int beijiaoID = 27;
+  int zhujiaoID = 27;
+  String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
+  int beijiaoID = 28;
 
   String callID = "";
   bool isConnectSuccess = false;

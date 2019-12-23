@@ -705,7 +705,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 
 - (void)sendCustomMessage:(NSDictionary *)args
 {
-    NSString *sessionId = args[@"sessionId"];
+    NSString *sessionId = args[@"nimSession"][@"sessionId"];
     NSString *customEncodeString = args[@"customEncodeString"];
     NSString *apnsContent = args[@"apnsContent"];
     NIMMessage *message = [[NIMMessage alloc] init];
@@ -1043,7 +1043,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
  *  @param message 当前发送的消息
  *  @param error   失败原因,如果发送成功则error为nil
  */
-- (void)     sendMessage:(NIMMessage *)message
+- (void)sendMessage:(NIMMessage *)message
     didCompleteWithError:(nullable NSError *)error
 {
     if (self.eventSink) {
@@ -1056,7 +1056,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             if (message.messageType == NIMMessageTypeVideo) {
                 NSDictionary *dict = [[NimDataManager shared] handleNIMMessage:message];
                 NSDictionary *tempDic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnRecvMessages],
-                                           @"message": dict };
+                                           @"message": @[dict] };
                 self.eventSink([[NimDataManager shared] dictionaryToJson:tempDic]);
             }
         } else {

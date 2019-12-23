@@ -1,3 +1,6 @@
+## 1.4.14
+* fix bug
+
 ## 1.4.13
 * add video complete callback
 
