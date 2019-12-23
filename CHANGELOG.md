@@ -1,5 +1,5 @@
-## 1.4.12
-* bug fix
+## 1.4.13
+* add video complete callback
 
 ## 1.4.7
 * add api

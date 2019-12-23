@@ -7,6 +7,7 @@ import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
 import 'recent_list.dart';
 
+// void main() => runApp(RecentListPage());
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -36,13 +37,13 @@ class _HomeWidgetState extends State<HomeWidget> {
   //  27       ae93a01e9a3f087e1e85a7de731955dc
   //  184600   971ddcaa4573470245d36eecc9d78201
 
-  int zhujiaoID = 184600;
-  String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
-  int beijiaoID = 27;
+  // int zhujiaoID = 184600;
+  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
+  // int beijiaoID = 27;
 
-  // int zhujiaoID = 28;
-  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 184600;
+  int zhujiaoID = 28;
+  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  int beijiaoID = 27;
 
   String callID = "";
   bool isConnectSuccess = false;
@@ -257,7 +258,37 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   ///发送视频消息
   void sendVideo() async {
-    var video = await ImagePicker.pickVideo(source: ImageSource.gallery);
+    await showDialog<Null>(
+      context: context,
+      builder: (BuildContext context) {
+        return new SimpleDialog(
+          title: new Text('选择'),
+          children: <Widget>[
+            new SimpleDialogOption(
+              child: new Text('相机拍摄'),
+              onPressed: () {
+                selectedVideo(0);
+                Navigator.of(context).pop();
+              },
+            ),
+            new SimpleDialogOption(
+              child: new Text('从相册选取'),
+              onPressed: () {
+                selectedVideo(1);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    ).then((val) {
+      print(val);
+    });
+  }
+
+  void selectedVideo(int type) async {
+    var video = await ImagePicker.pickVideo(
+        source: type == 0 ? ImageSource.camera : ImageSource.gallery);
     NIMSession nimSession = NIMSession(
         sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
     FlutterNimsdk().sendMessageVideo(video.path, nimSession);

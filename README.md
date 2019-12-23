@@ -3,6 +3,7 @@
 [![pub package](https://img.shields.io/pub/v/flutter_nimsdk.svg)](https://pub.dev/packages/flutter_nimsdk)
 
 用于`Flutter`的网易云信SDK
+**暂时只有iOS版本**
     
     
 ## 已完成功能
