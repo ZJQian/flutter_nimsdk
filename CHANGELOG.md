@@ -1,3 +1,6 @@
+## 1.4.16
+add snapChat
+
 ## 1.4.15
 * fix bug
 
