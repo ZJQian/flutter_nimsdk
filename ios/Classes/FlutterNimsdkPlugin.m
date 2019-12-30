@@ -9,6 +9,7 @@
 #import "IMCustomMessageAttachmentDecoder.h"
 #import "VideoManager.h"
 #import "NimSessionParser.h"
+#import "Attach/NTESSnapchatAttachment.h"
 //#import "FaceunityManager/FUManager.h"
 
 typedef enum : NSUInteger {
@@ -285,8 +286,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         UInt64 callID = callID_str == nil ? 0 : callID_str.longLongValue;
         //挂断电话
         [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
-//        [[[NIMAVChatSDK sharedSDK] netCallManager] removeDelegate:self];
-    } else if ([@"setRemoteViewLayout" isEqualToString:call.method]) { //设置对方视频窗口frame
     } else if ([@"records" isEqualToString:call.method]) { // 获取话单
         NIMNetCallRecordsSearchOption *searchOption = [[NIMNetCallRecordsSearchOption alloc] init];
         searchOption.timestamp = [[NSDate date] timeIntervalSince1970];
@@ -440,6 +439,71 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         [self sendMessage:NIMMessageTypeLocation args:call.arguments];
     } else if ([@"sendCustomMessage" isEqualToString:call.method]) {//自定义消息
         [self sendCustomMessage:call.arguments];
+    }else if ([@"sendSnapChat" isEqualToString:call.method]) {
+        // MARK: - 阅后即焚
+        NSDictionary *args = call.arguments;
+        NSString *path = args[@"imagePath"];
+        NSDictionary *sessionDic = args[@"nimSession"];
+        NSString *sessionID = sessionDic[@"sessionId"];
+        int type = [NSString stringWithFormat:@"%@", args == nil ? @"0" : sessionDic[@"sessionType"]].intValue;
+        NIMSessionType sessionType = NIMSessionTypeP2P;
+        if (type == 3) {
+            sessionType = NIMSessionTypeSuperTeam;
+        } else {
+            sessionType = type;
+        }
+
+        // 构造出具体会话
+        NIMSession *session = [NIMSession session:sessionID type:sessionType];
+        
+        
+        NTESSnapchatAttachment *attachment = [[NTESSnapchatAttachment alloc] init];
+        [attachment setImageFilePath:path];
+        NIMMessage *message               = [[NIMMessage alloc] init];
+        NIMCustomObject *customObject     = [[NIMCustomObject alloc] init];
+        customObject.attachment           = attachment;
+        message.messageObject             = customObject;
+        message.apnsContent = @"发来了阅后即焚";
+        
+        NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
+        setting.historyEnabled = NO;
+        setting.roamingEnabled = NO;
+        setting.syncEnabled    = NO;
+        message.setting = setting;
+        NSError *error = nil;
+        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
+        
+    }else if ([@"destorySnapChat" isEqualToString:call.method]) {
+        
+        NSDictionary *args = call.arguments;
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        NSString *messageId = args[@"messageId"];
+        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:@[messageId]];
+        for (NIMMessage *message in messages) {
+            if ([message.messageId isEqualToString:messageId]) {
+            
+                NIMMessage *tempMessage = message;
+                NIMCustomObject *object = (NIMCustomObject *)tempMessage.messageObject;
+                NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
+                attachment.isFired  = YES;
+                object.attachment = attachment;
+                tempMessage.messageObject = object;
+                
+                [[[NIMSDK sharedSDK] conversationManager] updateMessage:tempMessage forSession:tempMessage.session completion:^(NSError * _Nullable error) {
+                    
+                    if (error == nil) {
+                        result([[NimDataManager shared] dictionaryToJson:@{ @"message": @"销毁阅后即焚消息成功" }]);
+                    } else {
+                        NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"销毁阅后即焚消息失败" : error.userInfo[@"NSLocalizedDescription"];
+                        NSDictionary *dic = @{ @"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code] };
+
+                        result([[NimDataManager shared] dictionaryToJson:dic]);
+                    }
+                }];
+            }
+        }
+        
+        
     } else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
         self.sessionID = call.arguments[@"sessionId"];
         [[[NIMSDK sharedSDK] mediaManager] record:NIMAudioTypeAAC duration:60.0];
@@ -769,13 +833,21 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     NSDictionary *tempDic = [[NimDataManager shared] dictionaryWithJsonString:extendMessage];
     self.currentTimeStamp = tempDic[@"currentTimeStamp"];
     if (self.eventSink) {
-        NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnReceive],
-                               @"callID": [NSString stringWithFormat:@"%llu", callID],
-                               @"caller": caller,
-                               @"currentTimeStamp": tempDic[@"currentTimeStamp"],
-                               @"type": [NSNumber numberWithInteger:type],
-                               @"extendMessage": extendMessage == nil ? @"" : extendMessage };
-        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+        if (self.currentTimeStamp == nil) {
+            
+            NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnReceive],
+                                   @"error": @"currentTimeStamp 不能为空"};
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+        } else {
+            NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnReceive],
+                                   @"callID": [NSString stringWithFormat:@"%llu", callID],
+                                   @"caller": caller,
+                                   @"currentTimeStamp": tempDic[@"currentTimeStamp"],
+                                   @"type": [NSNumber numberWithInteger:type],
+                                   @"extendMessage": extendMessage == nil ? @"" : extendMessage };
+            self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+        }
+        
     }
 }
 
@@ -837,7 +909,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)onLocalDisplayviewReady:(UIView *)displayView
 {
     NSLog(@"onLocalDisplayviewReady == %@", displayView);
-
+    NSLog(@"onLocalDisplayviewReady  currentTimeStamp == %@",self.currentTimeStamp);
     if (displayView.bounds.size.width == 0) {
         [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"LocalDisplayView-%@", self.currentTimeStamp]];
     }
@@ -846,6 +918,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)onRemoteDisplayviewReady:(UIView *)displayView user:(NSString *)user
 {
     NSLog(@"onRemoteDisplayviewReady == %@, user == %@", displayView, user);
+    NSLog(@"onRemoteDisplayviewReady  currentTimeStamp == %@",self.currentTimeStamp);
 
     if (displayView.bounds.size.width == 0) {
         [_registrar registerViewFactory:[[FlutterNimViewFactory alloc] initWithMessenger:[_registrar messenger] displayView:displayView] withId:[NSString stringWithFormat:@"RemoteDisplayView-%@", self.currentTimeStamp]];

@@ -231,6 +231,18 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("sendCustomMessage", map);
   }
 
+  /// 发送阅后即焚消息
+  Future<void> sendSnapChat(NIMSession nimSession, String imagePath) async {
+    return await _channel.invokeMethod("sendSnapChat",
+        {"imagePath": imagePath, "nimSession": nimSession.toJson()});
+  }
+
+  /// 阅后即焚
+  Future<String> destorySnapChat(NIMSession session, String messageId) async {
+    return await _channel.invokeMethod("destorySnapChat",
+        {"session": session.toJson(), "messageId": messageId});
+  }
+
   // 开始录音
   Future<void> onStartRecording(String sessionId) async {
     return await _channel

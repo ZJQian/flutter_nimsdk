@@ -37,12 +37,12 @@ class _HomeWidgetState extends State<HomeWidget> {
   //  27       ae93a01e9a3f087e1e85a7de731955dc
   //  184600   971ddcaa4573470245d36eecc9d78201
 
-  // int zhujiaoID = 184600;
-  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
-  // int beijiaoID = 27;
+  // int zhujiaoID = 28;
+  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  // int beijiaoID = 184600;
 
-  int zhujiaoID = 27;
-  String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
+  int zhujiaoID = 184600;
+  String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
   int beijiaoID = 28;
 
   String callID = "";
@@ -166,7 +166,8 @@ class _HomeWidgetState extends State<HomeWidget> {
   /// 主叫发起通话请求
   void start() {
     String time = currentTimeMillis();
-    String extendMessage = '{"currentTimeStamp":"${time}"}';
+    String extendMessage =
+        '{"currentTimeStamp":"${time}","type":"1","price":"15"}';
     NIMNetCallOption callOption = NIMNetCallOption(
         extendMessage: extendMessage,
         apnsContent: "apnsContent",
@@ -254,6 +255,21 @@ class _HomeWidgetState extends State<HomeWidget> {
     NIMSession nimSession = NIMSession(
         sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
     FlutterNimsdk().sendMessageImage(image.path, nimSession);
+  }
+
+  /// 发送阅后即焚消息
+  void sendSnapChat() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    NIMSession nimSession = NIMSession(
+        sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
+    FlutterNimsdk().sendSnapChat(nimSession, image.path);
+  }
+
+  void destorySnapChat() async {
+    NIMSession nimSession = NIMSession(
+        sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
+
+    FlutterNimsdk().destorySnapChat(nimSession, "");
   }
 
   ///发送视频消息
@@ -542,6 +558,12 @@ class _HomeWidgetState extends State<HomeWidget> {
                           this.sendCustomMessage();
                         },
                         child: Text("发送自定义消息"),
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          this.sendSnapChat();
+                        },
+                        child: Text("发送阅后即焚"),
                       )
                     ],
                   ),
