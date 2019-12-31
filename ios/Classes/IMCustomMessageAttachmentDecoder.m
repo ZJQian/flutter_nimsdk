@@ -7,9 +7,9 @@
 
 #import "IMCustomMessageAttachmentDecoder.h"
 #import "IMCustomAttachment.h"
-#import "NSDictionary+NTESJson.h"
-#import "NTESCustomAttachmentDefines.h"
-#import "NTESSnapchatAttachment.h"
+#import "Category/NSDictionary+NTESJson.h"
+#import "Attach/NTESCustomAttachmentDefines.h"
+#import "Attach/NTESSnapchatAttachment.h"
 
 @implementation IMCustomMessageAttachmentDecoder
 
