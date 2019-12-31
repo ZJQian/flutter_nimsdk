@@ -34,6 +34,7 @@
                     attachment = [[NTESSnapchatAttachment alloc] init];
                     ((NTESSnapchatAttachment *)attachment).md5 = [data jsonString:CMMD5];
                     ((NTESSnapchatAttachment *)attachment).url = [data jsonString:CMURL];
+                    ((NTESSnapchatAttachment *)attachment).displayName = [data jsonString:CMDISPLAYNAME];
                     ((NTESSnapchatAttachment *)attachment).isFired = [data jsonBool:CMFIRE];
                 }
                     break;

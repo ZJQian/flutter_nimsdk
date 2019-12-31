@@ -439,44 +439,46 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         [self sendMessage:NIMMessageTypeLocation args:call.arguments];
     } else if ([@"sendCustomMessage" isEqualToString:call.method]) {//自定义消息
         [self sendCustomMessage:call.arguments];
-    }else if ([@"sendSnapChat" isEqualToString:call.method]) {
-        // MARK: - 阅后即焚
-        NSDictionary *args = call.arguments;
-        NSString *path = args[@"imagePath"];
-        NSString *apnsContent = args[@"apnsContent"];
-        NSString *displayName = [NSString stringWithFormat:@"%@",args[@"displayName"]];
-        NSDictionary *sessionDic = args[@"nimSession"];
-        NSString *sessionID = sessionDic[@"sessionId"];
-        int type = [NSString stringWithFormat:@"%@", args == nil ? @"0" : sessionDic[@"sessionType"]].intValue;
-        NIMSessionType sessionType = NIMSessionTypeP2P;
-        if (type == 3) {
-            sessionType = NIMSessionTypeSuperTeam;
-        } else {
-            sessionType = type;
-        }
-
-        // 构造出具体会话
-        NIMSession *session = [NIMSession session:sessionID type:sessionType];
-        
-        
-        NTESSnapchatAttachment *attachment = [[NTESSnapchatAttachment alloc] init];
-        [attachment setImageFilePath:path];
-        attachment.displayName = displayName;
-        NIMMessage *message               = [[NIMMessage alloc] init];
-        NIMCustomObject *customObject     = [[NIMCustomObject alloc] init];
-        customObject.attachment           = attachment;
-        message.messageObject             = customObject;
-        message.apnsContent = (apnsContent == nil) ? @"阅后即焚消息" : @"";
-        
-        NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
-        setting.historyEnabled = NO;
-        setting.roamingEnabled = NO;
-        setting.syncEnabled    = NO;
-        message.setting = setting;
-        NSError *error = nil;
-        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
-        
-    }else if ([@"destorySnapChat" isEqualToString:call.method]) {
+    }
+//    else if ([@"sendSnapChat" isEqualToString:call.method]) {
+//        // MARK: - 阅后即焚
+//        NSDictionary *args = call.arguments;
+//        NSString *path = args[@"imagePath"];
+//        NSString *apnsContent = args[@"apnsContent"];
+//        NSString *displayName = [NSString stringWithFormat:@"%@",args[@"displayName"]];
+//        NSDictionary *sessionDic = args[@"nimSession"];
+//        NSString *sessionID = sessionDic[@"sessionId"];
+//        int type = [NSString stringWithFormat:@"%@", args == nil ? @"0" : sessionDic[@"sessionType"]].intValue;
+//        NIMSessionType sessionType = NIMSessionTypeP2P;
+//        if (type == 3) {
+//            sessionType = NIMSessionTypeSuperTeam;
+//        } else {
+//            sessionType = type;
+//        }
+//
+//        // 构造出具体会话
+//        NIMSession *session = [NIMSession session:sessionID type:sessionType];
+//
+//
+//        NTESSnapchatAttachment *attachment = [[NTESSnapchatAttachment alloc] init];
+//        [attachment setImageFilePath:path];
+//        attachment.displayName = displayName;
+//        NIMMessage *message               = [[NIMMessage alloc] init];
+//        NIMCustomObject *customObject     = [[NIMCustomObject alloc] init];
+//        customObject.attachment           = attachment;
+//        message.messageObject             = customObject;
+//        message.apnsContent = (apnsContent == nil) ? @"阅后即焚消息" : @"";
+//
+//        NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
+//        setting.historyEnabled = NO;
+//        setting.roamingEnabled = NO;
+//        setting.syncEnabled    = NO;
+//        message.setting = setting;
+//        NSError *error = nil;
+//        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
+//
+//    }
+    else if ([@"destorySnapChat" isEqualToString:call.method]) {
         
         NSDictionary *args = call.arguments;
         NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
