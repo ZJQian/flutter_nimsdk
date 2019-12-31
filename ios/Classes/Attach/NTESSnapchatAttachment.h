@@ -22,7 +22,7 @@
 /**
  *
  */
-@property (nonatomic, assign) NSInteger displayName;
+@property (nonatomic, copy) NSString *displayName;
 
 
 - (void)setImage:(UIImage *)image;

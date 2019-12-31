@@ -443,6 +443,8 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         // MARK: - 阅后即焚
         NSDictionary *args = call.arguments;
         NSString *path = args[@"imagePath"];
+        NSString *apnsContent = args[@"apnsContent"];
+        NSString *displayName = [NSString stringWithFormat:@"%@",args[@"displayName"]];
         NSDictionary *sessionDic = args[@"nimSession"];
         NSString *sessionID = sessionDic[@"sessionId"];
         int type = [NSString stringWithFormat:@"%@", args == nil ? @"0" : sessionDic[@"sessionType"]].intValue;
@@ -459,11 +461,12 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         
         NTESSnapchatAttachment *attachment = [[NTESSnapchatAttachment alloc] init];
         [attachment setImageFilePath:path];
+        attachment.displayName = displayName;
         NIMMessage *message               = [[NIMMessage alloc] init];
         NIMCustomObject *customObject     = [[NIMCustomObject alloc] init];
         customObject.attachment           = attachment;
         message.messageObject             = customObject;
-        message.apnsContent = @"发来了阅后即焚";
+        message.apnsContent = (apnsContent == nil) ? @"阅后即焚消息" : @"";
         
         NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
         setting.historyEnabled = NO;
@@ -486,6 +489,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
                 NIMCustomObject *object = (NIMCustomObject *)tempMessage.messageObject;
                 NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
                 attachment.isFired  = YES;
+                attachment.displayName = @"0";
                 object.attachment = attachment;
                 tempMessage.messageObject = object;
                 

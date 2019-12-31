@@ -232,9 +232,14 @@ class FlutterNimsdk {
   }
 
   /// 发送阅后即焚消息
-  Future<void> sendSnapChat(NIMSession nimSession, String imagePath) async {
-    return await _channel.invokeMethod("sendSnapChat",
-        {"imagePath": imagePath, "nimSession": nimSession.toJson()});
+  Future<void> sendSnapChat(NIMSession nimSession, String imagePath,
+      String displayName, String apnsContent) async {
+    return await _channel.invokeMethod("sendSnapChat", {
+      "imagePath": imagePath,
+      "nimSession": nimSession.toJson(),
+      "displayName": displayName,
+      "apnsContent": apnsContent
+    });
   }
 
   /// 阅后即焚

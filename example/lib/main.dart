@@ -37,13 +37,13 @@ class _HomeWidgetState extends State<HomeWidget> {
   //  27       ae93a01e9a3f087e1e85a7de731955dc
   //  184600   971ddcaa4573470245d36eecc9d78201
 
-  // int zhujiaoID = 28;
-  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 184600;
+  int zhujiaoID = 28;
+  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  int beijiaoID = 27;
 
-  int zhujiaoID = 184600;
-  String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
-  int beijiaoID = 28;
+  // int zhujiaoID = 184600;
+  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
+  // int beijiaoID = 28;
 
   String callID = "";
   bool isConnectSuccess = false;
@@ -262,7 +262,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     NIMSession nimSession = NIMSession(
         sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
-    FlutterNimsdk().sendSnapChat(nimSession, image.path);
+    FlutterNimsdk().sendSnapChat(nimSession, image.path, "10", "阅后即焚");
   }
 
   void destorySnapChat() async {
@@ -270,7 +270,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
 
     FlutterNimsdk()
-        .destorySnapChat(nimSession, "b2c17e79-7f95-4ebd-85bd-57a8a6d9dae3");
+        .destorySnapChat(nimSession, "f39c1be0-2c17-4cce-a7d5-07272eba8c29");
   }
 
   ///发送视频消息

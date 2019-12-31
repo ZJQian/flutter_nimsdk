@@ -54,15 +54,6 @@
     }
 }
 
-- (void)setDisplayName:(NSInteger)displayName {
-    
-    _isFired = (displayName == 0);
-    if (_displayName != displayName) {
-        _displayName = displayName;
-        [self updateCover];
-    }
-}
-
 
 - (NSString *)filepath
 {
@@ -120,7 +111,7 @@
     [dict setObject:@(CustomMessageTypeSnapchat) forKey:CMType];
     [data setObject:_md5?_md5:@"" forKey:CMMD5];
     [data setObject:@(_isFired) forKey:CMFIRE];
-    [data setObject:@(_displayName) forKey:CMDISPLAYNAME];
+    [data setObject:_displayName ? _displayName : @"" forKey:CMDISPLAYNAME];
     if ([_url length])
     {
         [data setObject:_url forKey:CMURL];
