@@ -269,7 +269,8 @@ class _HomeWidgetState extends State<HomeWidget> {
     NIMSession nimSession = NIMSession(
         sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
 
-    FlutterNimsdk().destorySnapChat(nimSession, "");
+    FlutterNimsdk()
+        .destorySnapChat(nimSession, "b2c17e79-7f95-4ebd-85bd-57a8a6d9dae3");
   }
 
   ///发送视频消息
@@ -564,6 +565,12 @@ class _HomeWidgetState extends State<HomeWidget> {
                           this.sendSnapChat();
                         },
                         child: Text("发送阅后即焚"),
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          this.destorySnapChat();
+                        },
+                        child: Text("阅后即焚"),
                       )
                     ],
                   ),
