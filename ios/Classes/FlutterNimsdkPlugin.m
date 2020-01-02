@@ -468,6 +468,37 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         }];
         
         
+    }else if ([@"destorySnapChat" isEqualToString:call.method]) {
+
+        NSDictionary *args = call.arguments;
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        NSString *messageId = args[@"messageId"];
+        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:@[messageId]];
+        for (NIMMessage *message in messages) {
+            if ([message.messageId isEqualToString:messageId]) {
+            
+                NIMMessage *tempMessage = message;
+                NIMCustomObject *object = (NIMCustomObject *)tempMessage.messageObject;
+                NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
+                attachment.isFired  = YES;
+                attachment.displayName = @"0";
+                object.attachment = attachment;
+                tempMessage.messageObject = object;
+                
+                [[[NIMSDK sharedSDK] conversationManager] updateMessage:tempMessage forSession:tempMessage.session completion:^(NSError * _Nullable error) {
+                    
+                    if (error == nil) {
+                        result([[NimDataManager shared] dictionaryToJson:@{ @"message": @"销毁阅后即焚消息成功" }]);
+                    } else {
+                        NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"销毁阅后即焚消息失败" : error.userInfo[@"NSLocalizedDescription"];
+                        NSDictionary *dic = @{ @"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code] };
+                        result([[NimDataManager shared] dictionaryToJson:dic]);
+                    }
+                }];
+            }
+        }
+        
+        
     }else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
         self.sessionID = call.arguments[@"sessionId"];
         [[[NIMSDK sharedSDK] mediaManager] record:NIMAudioTypeAAC duration:60.0];

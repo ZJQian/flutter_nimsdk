@@ -280,14 +280,6 @@ class _HomeWidgetState extends State<HomeWidget> {
         .sendMessageCustom(session, map, apnsContent: "123456");
   }
 
-  void destorySnapChat() async {
-    NIMSession nimSession = NIMSession(
-        sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
-
-    FlutterNimsdk()
-        .destorySnapChat(nimSession, "8a6f583e-60f9-42a8-b272-bd9d1d482a4c");
-  }
-
   ///发送视频消息
   void sendVideo() async {
     await showDialog<Null>(

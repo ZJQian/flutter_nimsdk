@@ -247,11 +247,11 @@ class FlutterNimsdk {
   //   });
   // }
 
-  // /// 阅后即焚
-  // Future<String> destorySnapChat(NIMSession session, String messageId) async {
-  //   return await _channel.invokeMethod("destorySnapChat",
-  //       {"session": session.toJson(), "messageId": messageId});
-  // }
+  /// 阅后即焚
+  Future<String> destorySnapChat(NIMSession session, String messageId) async {
+    return await _channel.invokeMethod("destorySnapChat",
+        {"session": session.toJson(), "messageId": messageId});
+  }
 
   // 开始录音
   Future<void> onStartRecording(String sessionId) async {
