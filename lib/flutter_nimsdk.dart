@@ -231,22 +231,27 @@ class FlutterNimsdk {
     return await _channel.invokeMethod("sendCustomMessage", map);
   }
 
-  /// 发送阅后即焚消息
-  Future<void> sendSnapChat(NIMSession nimSession, String imagePath,
-      String displayName, String apnsContent) async {
-    return await _channel.invokeMethod("sendSnapChat", {
-      "imagePath": imagePath,
-      "nimSession": nimSession.toJson(),
-      "displayName": displayName,
-      "apnsContent": apnsContent
-    });
+  ///上传视频接口
+  Future<String> uploadVideo(String videoPath) async {
+    return await _channel.invokeMethod("uploadVideo", {"videoPath": videoPath});
   }
 
-  /// 阅后即焚
-  Future<String> destorySnapChat(NIMSession session, String messageId) async {
-    return await _channel.invokeMethod("destorySnapChat",
-        {"session": session.toJson(), "messageId": messageId});
-  }
+  // /// 发送阅后即焚消息
+  // Future<void> sendSnapChat(NIMSession nimSession, String imagePath,
+  //     String displayName, String apnsContent) async {
+  //   return await _channel.invokeMethod("sendSnapChat", {
+  //     "imagePath": imagePath,
+  //     "nimSession": nimSession.toJson(),
+  //     "displayName": displayName,
+  //     "apnsContent": apnsContent
+  //   });
+  // }
+
+  // /// 阅后即焚
+  // Future<String> destorySnapChat(NIMSession session, String messageId) async {
+  //   return await _channel.invokeMethod("destorySnapChat",
+  //       {"session": session.toJson(), "messageId": messageId});
+  // }
 
   // 开始录音
   Future<void> onStartRecording(String sessionId) async {

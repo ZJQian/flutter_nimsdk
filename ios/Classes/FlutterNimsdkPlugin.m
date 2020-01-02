@@ -437,78 +437,38 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         [self sendMessage:NIMMessageTypeLocation args:call.arguments];
     } else if ([@"sendCustomMessage" isEqualToString:call.method]) {//自定义消息
         [self sendCustomMessage:call.arguments];
-    }
-//    else if ([@"sendSnapChat" isEqualToString:call.method]) {
-//        // MARK: - 阅后即焚
-//        NSDictionary *args = call.arguments;
-//        NSString *path = args[@"imagePath"];
-//        NSString *apnsContent = args[@"apnsContent"];
-//        NSString *displayName = [NSString stringWithFormat:@"%@",args[@"displayName"]];
-//        NSDictionary *sessionDic = args[@"nimSession"];
-//        NSString *sessionID = sessionDic[@"sessionId"];
-//        int type = [NSString stringWithFormat:@"%@", args == nil ? @"0" : sessionDic[@"sessionType"]].intValue;
-//        NIMSessionType sessionType = NIMSessionTypeP2P;
-//        if (type == 3) {
-//            sessionType = NIMSessionTypeSuperTeam;
-//        } else {
-//            sessionType = type;
-//        }
-//
-//        // 构造出具体会话
-//        NIMSession *session = [NIMSession session:sessionID type:sessionType];
-//
-//
-//        NTESSnapchatAttachment *attachment = [[NTESSnapchatAttachment alloc] init];
-//        [attachment setImageFilePath:path];
-//        attachment.displayName = displayName;
-//        NIMMessage *message               = [[NIMMessage alloc] init];
-//        NIMCustomObject *customObject     = [[NIMCustomObject alloc] init];
-//        customObject.attachment           = attachment;
-//        message.messageObject             = customObject;
-//        message.apnsContent = (apnsContent == nil) ? @"阅后即焚消息" : @"";
-//
-//        NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
-//        setting.historyEnabled = NO;
-//        setting.roamingEnabled = NO;
-//        setting.syncEnabled    = NO;
-//        message.setting = setting;
-//        NSError *error = nil;
-//        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:session error:&error];
-//
-//    }
-    else if ([@"destorySnapChat" isEqualToString:call.method]) {
+    }else if ([@"uploadVideo" isEqualToString:call.method]) {//上传视频
+        
         
         NSDictionary *args = call.arguments;
-        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
-        NSString *messageId = args[@"messageId"];
-        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:@[messageId]];
-        for (NIMMessage *message in messages) {
-            if ([message.messageId isEqualToString:messageId]) {
-            
-                NIMMessage *tempMessage = message;
-                NIMCustomObject *object = (NIMCustomObject *)tempMessage.messageObject;
-                NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
-                attachment.isFired  = YES;
-                attachment.displayName = @"0";
-                object.attachment = attachment;
-                tempMessage.messageObject = object;
-                
-                [[[NIMSDK sharedSDK] conversationManager] updateMessage:tempMessage forSession:tempMessage.session completion:^(NSError * _Nullable error) {
-                    
-                    if (error == nil) {
-                        result([[NimDataManager shared] dictionaryToJson:@{ @"message": @"销毁阅后即焚消息成功" }]);
-                    } else {
-                        NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"销毁阅后即焚消息失败" : error.userInfo[@"NSLocalizedDescription"];
-                        NSDictionary *dic = @{ @"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code] };
-
-                        result([[NimDataManager shared] dictionaryToJson:dic]);
-                    }
-                }];
-            }
+        NSString *path = args[@"videoPath"];
+        AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL fileURLWithPath:path]];
+        CMTime time = [asset duration];
+        CGFloat seconds = ceil(time.value*1000/time.timescale);
+        NSInteger fileSize = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil].fileSize;
+        NSArray *tracks = [asset tracksWithMediaType:AVMediaTypeVideo];
+        CGFloat width = 0;
+        CGFloat height = 0;
+        if([tracks count] > 0) {
+            AVAssetTrack *videoTrack = [tracks objectAtIndex:0];
+            width = videoTrack.naturalSize.width;
+            height = videoTrack.naturalSize.height;
         }
+        [[[NIMSDK sharedSDK] resourceManager] upload:path progress:^(float progress) {
+            
+        } completion:^(NSString * _Nullable urlString, NSError * _Nullable error) {
+            
+            NSDictionary *dic = @{@"path": path,
+                                  @"url": urlString,
+                                  @"width": @(width),
+                                  @"height": @(height),
+                                  @"duration": @(seconds),
+                                  @"size": @(fileSize)};
+            result([[NimDataManager shared] dictionaryToJson:dic]);
+        }];
         
         
-    } else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
+    }else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
         self.sessionID = call.arguments[@"sessionId"];
         [[[NIMSDK sharedSDK] mediaManager] record:NIMAudioTypeAAC duration:60.0];
     } else if ([@"onStopRecording" isEqualToString:call.method]) {//结束录音

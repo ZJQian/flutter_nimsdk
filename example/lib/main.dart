@@ -326,6 +326,14 @@ class _HomeWidgetState extends State<HomeWidget> {
     FlutterNimsdk().sendMessageVideo(video.path, nimSession);
   }
 
+  void uploadVideo() async {
+    var video = await ImagePicker.pickVideo(source: ImageSource.gallery);
+    print(video.length());
+    FlutterNimsdk().uploadVideo(video.path).then((result) {
+      print(result);
+    });
+  }
+
   ///发送已读消息回执
   void sendMessageReceipt() async {
     NIMMessage message = NIMMessage(from: "", messageId: "");
@@ -583,9 +591,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                       ),
                       RaisedButton(
                         onPressed: () {
-                          this.destorySnapChat();
+                          this.uploadVideo();
                         },
-                        child: Text("阅后即焚"),
+                        child: Text("上传视频"),
                       )
                     ],
                   ),
