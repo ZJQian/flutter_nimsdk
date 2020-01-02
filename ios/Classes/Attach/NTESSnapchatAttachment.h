@@ -23,6 +23,13 @@
  *
  */
 @property (nonatomic, copy) NSString *displayName;
+@property (nonatomic, copy) NSString *path;
+@property (nonatomic, copy) NSString *size;
+@property (nonatomic, copy) NSString *duration;
+@property (nonatomic, copy) NSString *height;
+@property (nonatomic, copy) NSString *width;
+@property (nonatomic, copy) NSString *extension;
+
 
 
 - (void)setImage:(UIImage *)image;

@@ -19,6 +19,10 @@ typedef NS_ENUM(NSInteger,NTESCustomMessageType){
     CustomMessageTypeWhiteboard = 4, //白板会话
     CustomMessageTypeRedPacket  = 5, //红包消息
     CustomMessageTypeRedPacketTip = 6, //红包提示消息
+    CustomMessageTypeSnapchatVideo   = 13, //阅后即焚视频
+    CustomMessageTypeLookSnapchatImage   = 20, //查看阅后即焚图片
+    CustomMessageTypeLookSnapchatVideo   = 21, //查看阅后即焚视频
+
     CustomMessageTypeMultiRetweet = 15,//多条消息合并转发
 };
 
@@ -29,7 +33,13 @@ typedef NS_ENUM(NSInteger,NTESCustomMessageType){
 #define CMFlag             @"flag"
 #define CMURL              @"url"
 #define CMMD5              @"md5"
-#define CMDISPLAYNAME      @"displayName"
+#define CMDisplayName      @"displayName"
+#define CMPath             @"path"
+#define CMSize             @"size"
+#define CMDuration         @"duration"
+#define CMHeight           @"height"
+#define CMWidth            @"width"
+#define CMExtension        @"extension"
 #define CMFIRE             @"fired"        //阅后即焚消息是否被焚毁
 #define CMCatalog          @"catalog"      //贴图类别
 #define CMChartlet         @"chartlet"     //贴图表情ID

@@ -3,11 +3,9 @@
 #import <NIMAVChat/NIMAVChat.h>
 #import <MJExtension/MJExtension.h>
 #import "NimDataManager.h"
-#import "VideoChat/VideoChatViewController.h"
 #import "FlutterNimViewFactory.h"
 #import "IMCustomAttachment.h"
 #import "IMCustomMessageAttachmentDecoder.h"
-#import "VideoManager.h"
 #import "NimSessionParser.h"
 #import "Attach/NTESSnapchatAttachment.h"
 //#import "FaceunityManager/FUManager.h"

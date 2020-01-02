@@ -111,7 +111,13 @@
     [dict setObject:@(CustomMessageTypeSnapchat) forKey:CMType];
     [data setObject:_md5?_md5:@"" forKey:CMMD5];
     [data setObject:@(_isFired) forKey:CMFIRE];
-    [data setObject:_displayName ? _displayName : @"" forKey:CMDISPLAYNAME];
+    [data setObject:_displayName ? _displayName : @"" forKey:CMDisplayName];
+    [data setObject:_path ? _path : @"" forKey:CMPath];
+    [data setObject:_size ? _size : @"0" forKey:CMSize];
+    [data setObject:_duration ? _duration : @"0" forKey:CMDuration];
+    [data setObject:_width ? _width : @"0" forKey:CMWidth];
+    [data setObject:_height ? _height : @"0" forKey:CMHeight];
+    [data setObject:_extension ? _extension : @"" forKey:CMExtension];
     if ([_url length])
     {
         [data setObject:_url forKey:CMURL];
