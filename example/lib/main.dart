@@ -37,13 +37,13 @@ class _HomeWidgetState extends State<HomeWidget> {
   //  27       ae93a01e9a3f087e1e85a7de731955dc
   //  184600   971ddcaa4573470245d36eecc9d78201
 
-  // int zhujiaoID = 28;
-  // String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
-  // int beijiaoID = 27;
+  int zhujiaoID = 28;
+  String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
+  int beijiaoID = 27;
 
-  int zhujiaoID = 184600;
-  String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
-  int beijiaoID = 28;
+  // int zhujiaoID = 184600;
+  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
+  // int beijiaoID = 28;
 
   String callID = "";
   bool isConnectSuccess = false;
@@ -261,19 +261,40 @@ class _HomeWidgetState extends State<HomeWidget> {
   void sendSnapChat() async {
     NIMSession session = NIMSession(
         sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
+    // Map map = {
+    //   "type": "13",
+    //   "data": {
+    //     "displayName": "10",
+    //     "md5": "30f02608aa27b23b6fc7e254e189daaa",
+    //     "size": "1642",
+    //     "duration": "5",
+    //     "width": "375",
+    //     "height": "500",
+    //     "extension": "extension",
+    //     "path": "videoPath",
+    //     "url":
+    //         "http://b-ssl.duitang.com/uploads/item/201607/22/20160722180244_4QYLN.jpeg"
+    //   }
+    // };
+    // Map map = {
+    //   "type": "2",
+    //   "data": {
+    //     "displayName": "8",
+    //     "md5": "30f02608aa27b23b6fc7e254e189daaa",
+    //     "size": "1642",
+    //     "path": "videoPath",
+    //     "url":
+    //         "http://b-ssl.duitang.com/uploads/item/201607/22/20160722180244_4QYLN.jpeg"
+    //   }
+    // };
     Map map = {
-      "type": "13",
+      "type": "7",
       "data": {
-        "displayName": "10",
-        "md5": "30f02608aa27b23b6fc7e254e189daaa",
-        "size": "1642",
-        "duration": "5",
-        "width": "375",
-        "height": "500",
-        "extension": "extension",
-        "path": "videoPath",
-        "url":
-            "http://b-ssl.duitang.com/uploads/item/201607/22/20160722180244_4QYLN.jpeg"
+        "gift_id": "10",
+        "gift_name": "小黄瓜",
+        "gift_img":
+            "http://downhdlogo.yy.com/hdlogo/640640/610/610/71/0067714824/u67714824VYCjn-CF7.png?20170426145912",
+        "price": "10"
       }
     };
     await FlutterNimsdk()
