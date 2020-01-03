@@ -53,6 +53,7 @@ typedef NS_ENUM(NSInteger,NTESCustomMessageType){
 #define CMGiftId           @"gift_id"
 #define CMGiftImg          @"gift_img"
 #define CMGiftName         @"gift_name"
+#define CMGiftSvga         @"gift_svga"
 #define CMPrice            @"price"
 
 #define CMFIRE             @"fired"        //阅后即焚消息是否被焚毁

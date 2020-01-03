@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString    *gift_img;
 @property (nonatomic, copy) NSString    *gift_name;
 @property (nonatomic, copy) NSString    *price;
+@property (nonatomic, copy) NSString    *gift_svga;
+
+
 
 
 @end

@@ -74,6 +74,7 @@
                     ((NTESSendGiftAttachment *)attachment).gift_id = [data jsonString:CMGiftId];
                     ((NTESSendGiftAttachment *)attachment).gift_img = [data jsonString:CMGiftImg];
                     ((NTESSendGiftAttachment *)attachment).gift_name = [data jsonString:CMGiftName];
+                    ((NTESSendGiftAttachment *)attachment).gift_svga = [data jsonString:CMGiftSvga];
                     ((NTESSendGiftAttachment *)attachment).price = [data jsonString:CMPrice];
                 }
                     break;

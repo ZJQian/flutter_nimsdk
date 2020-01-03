@@ -31,6 +31,7 @@
     [data setObject:_gift_id ? _gift_id : @"" forKey:CMGiftId];
     [data setObject:_gift_img ? _gift_img : @"" forKey:CMGiftImg];
     [data setObject:_gift_name ? _gift_name : @"" forKey:CMGiftName];
+    [data setObject:_gift_svga ? _gift_svga : @"" forKey:CMGiftSvga];
     [data setObject:_price ? _price : @"0" forKey:CMPrice];
     if ([_url length])
     {
