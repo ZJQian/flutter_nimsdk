@@ -17,6 +17,7 @@
 #import "Attach/NTESSnapchatVideoAttachment.h"
 #import "Attach/NTESSnapchatLookImageAttachment.h"
 #import "Attach/NTESSnapchatLookVideoAttachment.h"
+#import "Attach/NTESGuardAttachment.h"
 
 @implementation IMCustomMessageAttachmentDecoder
 
@@ -87,6 +88,17 @@
                     ((NTESSendBeanAttachment *)attachment).price = [data jsonString:CMPrice];
                 }
                     break;
+                    
+                case CustomMessageTypeGuard: {
+                    attachment = [[NTESGuardAttachment alloc] init];
+                    ((NTESGuardAttachment *)attachment).md5 = [data jsonString:CMMD5];
+                    ((NTESGuardAttachment *)attachment).url = [data jsonString:CMURL];
+                    ((NTESGuardAttachment *)attachment).gift_id = [data jsonString:CMGiftId];
+                    ((NTESGuardAttachment *)attachment).gift_img = [data jsonString:CMGiftImg];
+                    ((NTESGuardAttachment *)attachment).gift_name = [data jsonString:CMGiftName];
+                    ((NTESGuardAttachment *)attachment).price = [data jsonString:CMPrice];
+                }
+                    break;
 
                 case CustomMessageTypeSnapchatVideo: {
                     attachment = [[NTESSnapchatVideoAttachment alloc] init];
@@ -134,7 +146,7 @@
                 }
                 break;
             }
-            attachment = [self checkAttachment:attachment] ? attachment : nil;
+//            attachment = [self checkAttachment:attachment] ? attachment : nil;
         }
     }
     return attachment;

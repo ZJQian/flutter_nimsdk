@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger,NTESCustomMessageType){
     CustomMessageTypeSendGift = 8,
     CustomMessageTypeSendBean = 9,
     CustomMessageTypeIncomeBean = 10,
+    CustomMessageTypeGuard = 14,//守护
 
     
     
@@ -49,9 +50,9 @@ typedef NS_ENUM(NSInteger,NTESCustomMessageType){
 #define CMHeight           @"height"
 #define CMWidth            @"width"
 #define CMExtension        @"extension"
-#define CMGiftId           @"giftId"
-#define CMGiftImg          @"giftImg"
-#define CMGiftName         @"giftName"
+#define CMGiftId           @"gift_id"
+#define CMGiftImg          @"gift_img"
+#define CMGiftName         @"gift_name"
 #define CMPrice            @"price"
 
 #define CMFIRE             @"fired"        //阅后即焚消息是否被焚毁
