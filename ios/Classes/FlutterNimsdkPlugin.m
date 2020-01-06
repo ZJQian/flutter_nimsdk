@@ -13,6 +13,9 @@
 #import "Attach/NTESSnapchatLookImageAttachment.h"
 //#import "FaceunityManager/FUManager.h"
 
+
+
+
 typedef enum : NSUInteger {
     NIMDelegateTypeOnLogin = 0,
     NIMDelegateTypeOnReceive = 1,
@@ -35,6 +38,8 @@ typedef enum : NSUInteger {
     NIMDelegateTypeOnRecvRevokeMessageNotification = 17,
     NIMDelegateTypeFetchMessageAttachmentProcess = 18,
     NIMDelegateTypeFetchMessageAttachmentComplete = 19,
+    
+    NIMDelegateTypeOnReceiveCustomSystemNotification = 20,
 } NIMDelegateType;
 
 @interface FlutterNimsdkPlugin ()<NIMLoginManagerDelegate,
@@ -1279,6 +1284,14 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 
 - (void)onReceiveCustomSystemNotification:(NIMCustomSystemNotification *)notification {
     
+    NSString *content = notification.content;
+    NSDictionary *notificationDic = [[NimDataManager shared] dictionaryWithJsonString:content];
+    if (self.eventSink) {
+        NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnReceiveCustomSystemNotification],
+                               @"notification": notificationDic };
+        self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
+    }
+    
 }
 
 // MARK: - custom
@@ -1314,6 +1327,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     [[[NIMSDK sharedSDK] loginManager] removeDelegate:self];
     [[[NIMSDK sharedSDK] mediaManager] removeDelegate:self];
     [[[NIMSDK sharedSDK] chatManager] removeDelegate:self];
+    [[[NIMSDK sharedSDK] systemNotificationManager] removeDelegate:self];
 }
 
 @end
