@@ -115,7 +115,9 @@ class NIMMessage {
     data['text'] = this.text;
     data['isOutgoingMsg'] = this.isOutgoingMsg;
     data['messageType'] = this.messageType;
-    data['messageObject'] = this.messageObject.toJson();
+    data['messageObject'] = this.messageObject == null
+        ? this.messageObject
+        : this.messageObject.toJson();
     data['deliveryState'] = this.deliveryState;
     data['customMessageContent'] = this.customMessageContent;
     return data;
