@@ -115,7 +115,7 @@ class NIMMessage {
     data['text'] = this.text;
     data['isOutgoingMsg'] = this.isOutgoingMsg;
     data['messageType'] = this.messageType;
-    data['messageObject'] = this.messageObject;
+    data['messageObject'] = this.messageObject.toJson();
     data['deliveryState'] = this.deliveryState;
     data['customMessageContent'] = this.customMessageContent;
     return data;
@@ -182,6 +182,21 @@ class NIMMessageObject {
     remoteExt = json['remoteExt'] ?? {};
     width = json['width'] ?? 0;
     height = json['height'] ?? 0;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['url'] = this.url;
+    data['thumbUrl'] = this.thumbUrl;
+    data['thumbPath'] = this.thumbPath;
+    data['coverUrl'] = this.coverUrl;
+    data['path'] = this.path;
+    data['duration'] = this.duration;
+    data['isPlayed'] = this.isPlayed;
+    data['remoteExt'] = this.remoteExt;
+    data['width'] = this.width;
+    data['height'] = this.height;
+    return data;
   }
 }
 

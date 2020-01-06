@@ -41,8 +41,8 @@ class _HomeWidgetState extends State<HomeWidget> {
   String zhujiaoToken = "f51d1656315ac021d623f556dd493985";
   int beijiaoID = 27;
 
-  // int zhujiaoID = 184600;
-  // String zhujiaoToken = "971ddcaa4573470245d36eecc9d78201";
+  // int zhujiaoID = 27;
+  // String zhujiaoToken = "ae93a01e9a3f087e1e85a7de731955dc";
   // int beijiaoID = 28;
 
   String callID = "";
@@ -386,6 +386,19 @@ class _HomeWidgetState extends State<HomeWidget> {
     await FlutterNimsdk().sendMessageCustom(session, {"custom": "自定义消息"});
   }
 
+  void sendViewed() async {
+    NIMSession session = NIMSession(
+        sessionId: beijiaoID.toString(), sessionType: NIMSessionType.P2P.index);
+    NIMMessageObject messageObject = NIMMessageObject(
+        url:
+            "https://vdse.bdstatic.com//d719a00ef3e9242e4f15d09eb3a56885?authorization=bce-auth-v1%2F40f207e648424f47b2e3dfbb1014b1a5%2F2017-05-11T09%3A02%3A31Z%2F-1%2F%2Fa995633866dcbad98a024d34995d8307e8bd7db308387283e725884842c7561e");
+    NIMMessage message = NIMMessage(
+        messageId: "", messageType: 100, messageObject: messageObject);
+    FlutterNimsdk().sendViewed(session, message, "21").then((result) {
+      print(result);
+    });
+  }
+
   Widget handleCall(BuildContext context) {
     if (showCallPage) {
       return Opacity(
@@ -607,6 +620,12 @@ class _HomeWidgetState extends State<HomeWidget> {
                           this.uploadVideo();
                         },
                         child: Text("上传视频"),
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          this.sendViewed();
+                        },
+                        child: Text("视频自定义通知"),
                       )
                     ],
                   ),

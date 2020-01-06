@@ -8,6 +8,9 @@
 #import "IMCustomMessageAttachmentDecoder.h"
 #import "NimSessionParser.h"
 #import "Attach/NTESSnapchatAttachment.h"
+#import "Attach/NTESSnapchatVideoAttachment.h"
+#import "Attach/NTESSnapchatLookVideoAttachment.h"
+#import "Attach/NTESSnapchatLookImageAttachment.h"
 //#import "FaceunityManager/FUManager.h"
 
 typedef enum : NSUInteger {
@@ -39,6 +42,7 @@ typedef enum : NSUInteger {
                                   NIMNetCallManagerDelegate,
                                   NIMConversationManagerDelegate,
                                   NIMChatManagerDelegate,
+                                  NIMSystemNotificationManagerDelegate,
                                   NIMMediaManagerDelegate>
 {
     NSObject<FlutterPluginRegistrar> *_registrar;
@@ -83,6 +87,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     [[[NIMSDK sharedSDK] loginManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] mediaManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] chatManager] addDelegate:instance];
+    [[[NIMSDK sharedSDK] systemNotificationManager] addDelegate:instance];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:instance];
     [[[NIMAVChatSDK sharedSDK] netCallManager] addDelegate:instance];
 
@@ -473,15 +478,32 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         NSDictionary *args = call.arguments;
         NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
         NSString *messageId = args[@"messageId"];
+        NSInteger type = [NSString stringWithFormat:@"%@",args[@"type"]].integerValue;
         NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:session messageIds:@[messageId]];
         for (NIMMessage *message in messages) {
+        
             if ([message.messageId isEqualToString:messageId]) {
-            
                 NIMMessage *tempMessage = message;
                 NIMCustomObject *object = (NIMCustomObject *)tempMessage.messageObject;
-                NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
-                attachment.isFired  = YES;
-                attachment.displayName = @"0";
+                id<NIMCustomAttachment> attachment = nil;
+                if (type == 2) {
+                    attachment = (NTESSnapchatAttachment *)object.attachment;
+                    ((NTESSnapchatAttachment *)attachment).isFired  = YES;
+                    ((NTESSnapchatAttachment *)attachment).displayName = @"0";
+                }else if (type == 13) {
+                    attachment = (NTESSnapchatVideoAttachment *)object.attachment;
+                    ((NTESSnapchatVideoAttachment *)attachment).isFired  = YES;
+                    ((NTESSnapchatVideoAttachment *)attachment).displayName = @"0";
+                }else if (type == 20) {
+                    attachment = (NTESSnapchatLookImageAttachment *)object.attachment;
+                    ((NTESSnapchatLookImageAttachment *)attachment).isFired  = YES;
+                    ((NTESSnapchatLookImageAttachment *)attachment).displayName = @"0";
+                }else if (type == 21) {
+                    attachment = (NTESSnapchatLookVideoAttachment *)object.attachment;
+                    ((NTESSnapchatLookVideoAttachment *)attachment).isFired  = YES;
+                    ((NTESSnapchatLookVideoAttachment *)attachment).displayName = @"0";
+                }
+                
                 object.attachment = attachment;
                 tempMessage.messageObject = object;
                 
@@ -499,7 +521,45 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
         }
         
         
-    }else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
+    }else if ([@"sendViewed" isEqualToString:call.method]) {//自定义通知
+        
+        
+        NSDictionary *args = call.arguments;
+        NSDictionary *message = args[@"message"];
+        
+        NIMSession *session = [NIMSession mj_objectWithKeyValues:args[@"session"]];
+        
+        NSMutableDictionary *dataDic = [NSMutableDictionary dictionary];
+        dataDic[@"body"] = @"the_content_for_display";
+        dataDic[@"url"] = message[@"messageObject"][@"url"];
+        
+        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+        NSString *type = [NSString stringWithFormat:@"%@",args[@"type"]];
+        dic[@"type"] = type;
+        dic[@"uuid"] = message[@"messageId"];
+        dic[@"data"] = dataDic;
+        
+        NIMCustomSystemNotification *noti = [[NIMCustomSystemNotification alloc] initWithContent:[[NimDataManager shared] dictionaryToJson:dic]];
+        noti.apnsContent = @"the_content_for_apns";
+        
+        
+        [[[NIMSDK sharedSDK] systemNotificationManager] sendCustomNotification:noti toSession:session completion:^(NSError * _Nullable error) {
+            
+            NSLog(@"%@",error);
+            if (error == nil) {
+                
+                NSDictionary *returnDic = @{@"message": [type isEqualToString:@"21"] ? @"视频自定义通知发送成功" : @"图片自定义通知发送成功"};
+                result([[NimDataManager shared] dictionaryToJson:returnDic]);
+                
+            } else {
+                NSString *msg = error.userInfo[@"NSLocalizedDescription"] == nil ? @"自定义通知发送失败" : error.userInfo[@"NSLocalizedDescription"];
+                NSDictionary *returnDic = @{ @"error": msg, @"errorCode": [NSNumber numberWithInteger:error.code] };
+                result([[NimDataManager shared] dictionaryToJson:returnDic]);
+            }
+        }];
+        
+        
+    } else if ([@"onStartRecording" isEqualToString:call.method]) {//录音
         self.sessionID = call.arguments[@"sessionId"];
         [[[NIMSDK sharedSDK] mediaManager] record:NIMAudioTypeAAC duration:60.0];
     } else if ([@"onStopRecording" isEqualToString:call.method]) {//结束录音
@@ -862,7 +922,6 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
 - (void)onCallEstablished:(UInt64)callID
 {
     //通话建立成功 开始计时 刷新UI
-
     if (self.eventSink) {
         NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnCallEstablished],
                                @"callID": [NSString stringWithFormat:@"%llu", callID] };
@@ -1214,6 +1273,12 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);
         }
     }
+}
+
+// MARK: - NIMSystemNotificationManagerDelegate
+
+- (void)onReceiveCustomSystemNotification:(NIMCustomSystemNotification *)notification {
+    
 }
 
 // MARK: - custom
