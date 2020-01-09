@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:flutter_nimsdk/flutter_nimsdk.dart';
 
 class VideoPage extends StatefulWidget {
-
-
   final String timeStamp;
   VideoPage({Key key, @required this.timeStamp}) : super(key: key);
 
@@ -13,9 +11,6 @@ class VideoPage extends StatefulWidget {
 }
 
 class _VideoPageState extends State<VideoPage> {
-
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +41,7 @@ class _VideoPageState extends State<VideoPage> {
                   child: RaisedButton(
                     color: Colors.yellow,
                     onPressed: () {
-                      Navigator.pop(context,"挂断");
+                      Navigator.pop(context, "挂断");
                     },
                     child: Text("挂断"),
                   ),
@@ -82,7 +77,8 @@ class _VideoPageState extends State<VideoPage> {
                 RaisedButton(
                   color: Colors.yellow,
                   onPressed: () {
-                    FlutterNimsdk().setControlType(NIMNetCallControlType.closeVideo);
+                    FlutterNimsdk()
+                        .setControlType(NIMNetCallControlType.closeVideo);
                   },
                   child: Text("网络控制"),
                 )

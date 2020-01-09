@@ -4,6 +4,8 @@ PODS:
     - Flutter
     - MJExtension
     - NIMSDK
+  - fluttertoast (0.0.2):
+    - Flutter
   - image_picker (0.0.1):
     - Flutter
   - MJExtension (3.2.1)
@@ -12,6 +14,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_nimsdk (from `.symlinks/plugins/flutter_nimsdk/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
 
 SPEC REPOS:
@@ -24,12 +27,15 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_nimsdk:
     :path: ".symlinks/plugins/flutter_nimsdk/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_nimsdk: 2f65ed3240679651eff70aaa61301725813cd3cb
+  fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   image_picker: e3eacd46b94694dde7cf2705955cece853aa1a8f
   MJExtension: 635f2c663dcb1bf76fa4b715b2570a5710aec545
   NIMSDK: 52ce92caa6d8f783eca25bf09e7901752abb7c25

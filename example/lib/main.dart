@@ -6,6 +6,7 @@ import 'video.dart';
 import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
 import 'recent_list.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 // void main() => runApp(RecentListPage());
 void main() => runApp(MyApp());
@@ -119,8 +120,8 @@ class _HomeWidgetState extends State<HomeWidget> {
       });
     } else if (delegateType == 4) {
       if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
         this.hangup();
+        Navigator.of(context).pop();
       }
     }
   }
@@ -187,22 +188,33 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   ///被叫响应通话请求
   void response(BuildContext context, bool accept) {
-    NIMResponse nimResponse = NIMResponse(callID: callID, accept: accept);
+    if (callID != null) {
+      NIMResponse nimResponse = NIMResponse(callID: callID, accept: accept);
 
-    FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {
-      "response": nimResponse.toJson(),
-      "mediaType": NIMNetCallMediaType.Video.index
-    }).then((result) {
-      setState(() {
-        showCallPage = false;
+      FlutterNimsdk().methodChannelPlugin().invokeMethod('response', {
+        "response": nimResponse.toJson(),
+        "mediaType": NIMNetCallMediaType.Video.index
+      }).then((result) {
+        setState(() {
+          showCallPage = false;
+        });
+        print("this.beijiaoTimeStamp 是:    " + this.beijiaoTimeStamp);
       });
-      print("this.beijiaoTimeStamp 是:    " + this.beijiaoTimeStamp);
-    });
+    } else {
+      Fluttertoast.showToast(
+          msg: "callID为空，请检查参数是否完整",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 
   /// 挂断
   void hangup() async {
-    await FlutterNimsdk().hangup(callID);
+    await FlutterNimsdk().hangup(zhujiaoToken);
   }
 
   /// 获取话单

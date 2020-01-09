@@ -895,6 +895,7 @@ static NSString *const kMethodChannelName = @"flutter_nimsdk/Method/Channel";
     if (self.eventSink) {
         if (self.currentTimeStamp == nil) {
             
+            
             NSDictionary *dic = @{ @"delegateType": [NSNumber numberWithInt:NIMDelegateTypeOnReceive],
                                    @"error": @"currentTimeStamp 不能为空"};
             self.eventSink([[NimDataManager shared] dictionaryToJson:dic]);

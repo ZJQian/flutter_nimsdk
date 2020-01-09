@@ -11,7 +11,7 @@
 
 @interface DisplayView : NSObject<FlutterPlatformView>
 
-- (instancetype)initWithWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId arguments:(id _Nullable)args binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger view:(UIView *)displayView;
+- (instancetype)initWithWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId arguments:(id)args binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger view:(UIView *)displayView;
 
 @end
 
